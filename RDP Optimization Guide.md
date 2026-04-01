@@ -57,6 +57,7 @@ This provides the highest possible detail, ensuring images are perfectly sharp.
 1.  **In Microsoft Remote Desktop Connection Settings**:
     *   **Display Tab**: ✅ **Enable** "Optimize for Retina displays".
     *   **Color depth**: High Color (32 bit).
+    *   **Graphics interpolation**: Set to **None**. (This prevents pixel smoothing, keeping the image sharp and accurate for medical viewing).
 2.  **User Experience**:
     *   The Windows host will recognize the native high resolution of the MacBook.
     *   **Result**: No compression artifacts, maximum pixel density, and perfect color precision (via AVC 4:4:4).
