@@ -1,0 +1,12 @@
+# Obsidian workspace settings (machine-specific)
+.obsidian/workspace.json
+.obsidian/workspace-mobile.json
+
+# Plugins (install separately on each machine)
+.obsidian/plugins/
+
+# Cache
+.obsidian/cache
+
+# macOS
+.DS_Store
