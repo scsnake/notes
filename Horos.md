@@ -408,3 +408,21 @@ curl -s -X POST http://localhost:8080/RPC2 \
     <methodName>GetDisplayed2DViewerStudies</methodName>
     <params></params></methodCall>'
 ```
+
+
+---
+
+## Batch Import — AppleScript list syntax (confirmed 2026-04-12)
+
+**Finding:** `tell application "Horos" to open {POSIX file "...", POSIX file "...", ...}` accepts a list of paths in one AppleScript call. Horos shows **a single "Copy Links" dialog** for all folders — one click imports the entire batch.
+
+**Test:** 3 CT/MR study folders passed as an AppleScript list → 1 dialog appeared → 1 click → all 3 confirmed in Horos DB.
+
+**Implementation in `sync_studies.py`** (`batch_import_to_horos_cli`):
+- Build `{POSIX file "...", ...}` list from all `study_dirs`
+- Start a background click-loop thread (`_horos_click_copy_links_loop`) *before* firing the open event — polls every 0.25 s, clicks on detection, counts clicks until `n_expected` reached or timeout
+- After import: `_verify_horos_import` waits 10 s for Horos indexing, then queries `HorosDatabase` for each accession — retries any missing studies once
+
+**Key detail:** click count = 1 even for N studies (batch open triggers one dialog). Warning threshold is now `clicked == 0` (not `clicked < n`).
+
+> Updates section 7 — `open POSIX file` list variant confirmed working.
