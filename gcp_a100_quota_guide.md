@@ -47,6 +47,39 @@ To run an A100 GPU instance (such as the smallest `a2-highgpu-1g` machine type),
 
 ---
 
+## 3. Strategies for A100 Availability & Stockouts
+
+NVIDIA A100 GPUs are in extremely high demand, particularly for Preemptible/Spot instances. If you encounter stockouts, apply the following strategies:
+
+### A. Shift to High-Capacity GCP Regions
+If your workload is not bound to a specific region, shift deployment to regions with larger GPU pools:
+*   **United States:** `us-central1` (Iowa), `us-east1` (South Carolina), `us-east4` (N. Virginia), and `us-west1` (Oregon).
+*   **Europe:** `europe-west4` (Eemshaven, Netherlands).
+*   **Asia-Pacific:** If you must deploy in Asia, `asia-southeast1` (Singapore) generally has better capacity than `asia-northeast1` (Tokyo).
+*   *Tip:* Look for **AI zones** (e.g., zones with names ending in `-ai1a`) if available in your project configuration.
+
+### B. Adjust Request Timing
+For Preemptible/Spot instances, request capacity during the target region's off-peak hours (e.g., between **2:00 AM and 6:00 AM local time** in the target zone).
+
+### C. Consider Alternative GPU Types
+If your workload does not strictly require the scale of an A100:
+*   **NVIDIA L4 GPUs:** Excellent alternative for inference and mid-scale training/fine-tuning. They are cheaper and have significantly higher availability.
+*   Your project already has quota limits of `1.0` for both `NVIDIA_L4_GPUS` and `PREEMPTIBLE_NVIDIA_L4_GPUS` in `asia-northeast1` that can be utilized immediately.
+
+### D. Explore Alternative Platforms & GPU Clouds
+If GCP capacity remains constrained, consider dedicated GPU cloud providers which are often cheaper and offer better on-demand/spot availability:
+*   **Lambda Labs:** Low pricing, stable performance.
+*   **RunPod:** Quick spin-up, customizable instances.
+*   **Vast.ai / TensorDock:** Marketplaces for renting spare GPU capacity at deep discounts.
+
+### E. Monitor Global GPU Availability
+You can check live inventory, pricing, and availability trends across providers using these aggregators:
+*   **[GPU Finder (gpufinder.dev)](https://gpufinder.dev)**
+*   **[GetDeploying (getdeploying.com)](https://getdeploying.com)**
+*   **[GPUPerHour (gpuperhour.com)](https://gpuperhour.com)**
+
+---
+
 ## Signature
 * **Model:** Gemini 3.5 Flash
-* **Timestamp:** 2026-05-23T16:42:14+08:00
+* **Timestamp:** 2026-05-23T16:57:58+08:00
