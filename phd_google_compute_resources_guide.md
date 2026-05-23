@@ -10,7 +10,7 @@ Google offers several programs that grant free or subsidized GPU/TPU/GCP resourc
 
 ### A. TPU Research Cloud (TRC)
 * **What it provides:** Free access to high-performance Cloud TPUs (v2, v3, v4, v5e, v5p) and TPU pods.
-* **Global Availability:** Available globally (except in US-embargoed countries).
+* **Eligibility & Global Availability:** **Available globally** (except US-embargoed countries) to researchers, PhDs, Master's, and undergraduate students alike, as long as you plan to publish/share your work.
 * **How to Apply:** Apply online at **[sites.research.google/trc](https://sites.research.google/trc)**.
 * **Information to Provide in the Application:**
   * **Research Proposal:** A short abstract describing your DL research topic, objectives, and why you require TPUs (e.g., massive batch sizes, large model training).
@@ -20,17 +20,17 @@ Google offers several programs that grant free or subsidized GPU/TPU/GCP resourc
 
 ### B. Google Cloud Research Credits
 * **What it provides:** Direct GCP credits (typically $1,000 for PhD students; faculty can apply for up to $5,000 or more per project). These credits can be spent on any GCP service, including standard GPU instances (A100, L4, T4), CPU compute VMs, Cloud Storage (GCS), or database infrastructure.
-* **Global Availability:** Available globally to students and researchers at accredited academic institutions.
-* **How to Apply:** Apply at **[edu.google.com/programs/credits/researchers](https://edu.google.com/programs/credits/researchers/)**.
+* **Eligibility & Global Availability:** Available globally, but **restricted to faculty, postdocs, and PhD students**. Undergraduates and Master's students cannot apply individually, but they can be allocated credits if their faculty advisor applies on behalf of a research project/lab.
+* **How to Apply:** Apply at **[edu.google.com/programs/credits/research](https://edu.google.com/programs/credits/research/)**.
 * **Information to Provide in the Application:**
   * **Project Description:** A detailed research proposal explaining the scientific problem, methodology, and expected outcomes.
   * **GCP Architecture Plan:** A brief breakdown of how you will use GCP services (e.g., "We will deploy 2x L4 GPUs on Compute Engine and store datasets in Cloud Storage").
   * **Faculty Advisor Verification:** You must provide your advisor's name and contact details to verify your academic standing.
 
-### C. Google Colab Pro / Pro+
-* **What it provides:** A paid monthly subscription that offers priority access to high-end GPUs (V100, A100, L4) and TPUs, background execution limits, and terminal access inside notebook environments.
-* **Global Availability:** Available in most countries globally.
-* **How to Get Started:** Subscribe directly via **[colab.research.google.com/signup](https://colab.research.google.com/signup)**.
+### C. Google Colab & Colab Pro
+* **What it provides:** Free tier access to GPUs (T4) and TPUs for quick coding, with optional paid subscriptions (**Colab Pro/Pro+**) for faster GPUs (V100, A100, L4) and longer runtimes.
+* **Eligibility & Student Benefits:** The free tier is available globally to all students. The paid Pro tiers generally have **no permanent student discount**. However, Google periodically runs promotional offers providing no-cost Colab Pro access to verified students/educators (typically US-only, verified via SheerID on the signup page).
+* **How to Get Started:** Access Colab at **[colab.research.google.com](https://colab.research.google.com/)** or check for active student promotions at the **[signup page](https://colab.research.google.com/signup)**.
 
 ---
 
@@ -78,4 +78,4 @@ While hardware specifications (TFLOPS, memory bandwidth) are important, a PhD st
 
 ## Signature
 * **Model:** Gemini 3.5 Flash
-* **Timestamp:** 2026-05-23T17:17:54+08:00
+* **Timestamp:** 2026-05-23T18:42:51+08:00
