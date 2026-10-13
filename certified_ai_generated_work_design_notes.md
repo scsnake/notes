@@ -50,6 +50,57 @@ h_i = H( h_(i-1) || H(salt_i || input_i) || H(output_i) || spec_i || t_i )
 - **t_i** is the provider timestamp.
 - **salt_i** stops dictionary guessing of short inputs.
 
+```mermaid
+flowchart TD
+    subgraph Step1["Step 1"]
+        direction TB
+        In1["Input 1 + salt 1<br/>(User prompt, base commit)"]
+        Out1["Output 1<br/>(Model text, tool calls)"]
+        Spec1["Spec 1<br/>(Model ID, effort, tools)"]
+        T1["Timestamp t_1<br/>(Provider clock)"]
+        H1["Step Hash: h_1"]
+        In1 & Out1 & Spec1 & T1 --> H1
+    end
+
+    subgraph Step2["Step 2, first attempt (abandoned)"]
+        direction TB
+        In2["Input 2 + salt 2<br/>(Tool results, file reads)"]
+        Out2["Output 2<br/>(Code edits, tool calls)"]
+        Spec2["Spec 2<br/>(Model ID, effort, tools)"]
+        T2["Timestamp t_2"]
+        H2["Step Hash: h_2"]
+        In2 & Out2 & Spec2 & T2 --> H2
+    end
+
+    subgraph Step2R["Step 2, regenerated (fork)"]
+        direction TB
+        In2R["Input 2 + new salt<br/>(Same tool results)"]
+        Out2R["Output 2b<br/>(New code edits, tool calls)"]
+        Spec2R["Spec 2b<br/>(Same settings, regeneration count 1)"]
+        T2R["Timestamp t_2b"]
+        H2R["Step Hash: h_2b"]
+        In2R & Out2R & Spec2R & T2R --> H2R
+    end
+
+    H1 -->|"parent"| H2
+    H1 -->|"parent"| H2R
+
+    subgraph StepN["Step N (Session End)"]
+        direction TB
+        HN["Final Step Hash: h_n"]
+        Closed["'closed' marker"]
+        Overlap["Overlap score"]
+        Payload["Receipt Payload<br/>(h_n + closed + overlap)"]
+        HN & Closed & Overlap --> Payload
+    end
+
+    H2R -.->|"later steps"| HN
+
+    Key[("Provider Private Key")] --> Sign["Provider signs payload"]
+    Payload --> Sign
+    Sign --> Receipt["Provider-Signed Receipt"]
+```
+
 ### 3.3 Signatures, not encryption
 
 Hashing gives integrity. A signature gives authenticity. Encryption only hides, and a hash already hides. The provider signs the chain head plus a `closed` marker at session end. Public keys live in a JWKS at a well-known URL, as in Web Bot Auth. Verification is offline. The provider stores heads only for disputes and revocation.
@@ -74,6 +125,43 @@ The model emits edits, not a final file. Two options:
 1. **Replay.** Base commit hash goes into the first input. The verifier replays the tool calls over that base and compares to the PR tree. A hand edit after the session breaks the match. Works with a local harness, because the harness cannot change what the provider signed.
 2. **Hosted execution.** When the provider runs the sandbox, it signs the final tree hash directly. Simplest. Managed Agents and cloud sessions are the natural first home.
 
+```mermaid
+flowchart TD
+    subgraph Execution["1. Session Execution"]
+        direction TB
+        Hosted["Hosted Cloud Sandbox<br/>(Provider runs environment)"]
+        Local["Local Harness (Claude Code)<br/>(Base commit in input_1)"]
+        Hosted -->|"Provider signs tree hash directly"| ReceiptHosted["Receipt with Tree Hash"]
+        Local -->|"Provider signs tool calls in chain"| ReceiptLocal["Receipt with Step Chain<br/>(hashes only)"]
+        Local -->|"Author discloses on request"| Disclosed["Disclosed Tool Calls<br/>(from the session transcript)"]
+    end
+
+    subgraph Verification["2. Offline Verification (GitHub Check / CI)"]
+        direction TB
+        JWKS["Provider JWKS<br/>(Public Key Directory, cached)"] --> CheckSig{"Verify Signature"}
+        ReceiptHosted --> CheckSig
+        ReceiptLocal --> CheckSig
+
+        CheckSig -->|Invalid| FailSig["Fail: Invalid Signature"]
+        CheckSig -->|Valid| CheckClosed{"'closed' marker present?"}
+        CheckClosed -->|No| FailOpen["Fail: Session not closed<br/>(chain may be truncated)"]
+        CheckClosed -->|Yes| MatchCheck{"Verify Code Integrity"}
+
+        MatchCheck -->|"Hosted Mode"| CompareHosted{"Tree Hash == PR Tree?"}
+        MatchCheck -->|"Local Mode"| CheckCalls{"Disclosed tool calls<br/>match chain hashes?"}
+        Disclosed --> CheckCalls
+        CheckCalls -->|No| FailCalls["Fail: Tool calls do not match the chain"]
+        CheckCalls -->|Yes| Replay["Replay tool calls over Base Commit"]
+        Replay --> CompareLocal{"Replayed Tree == PR Tree?"}
+
+        CompareHosted -->|Match| Pass["Verified PR Check<br/>• Model and effort confirmed<br/>• Session closed<br/>• PR tree equals session result<br/>• Overlap score shown"]
+        CompareLocal -->|Match| Pass
+
+        CompareHosted -->|Mismatch| FailEdit["Fail: PR tree differs from session result<br/>(hand edit, rebase, or format hook)"]
+        CompareLocal -->|Mismatch| FailEdit
+    end
+```
+
 ## 5. The echo attack and the overlap score
 
 A valid chain proves integrity and origin, not authorship. Write the PR by hand, give it to Fable, say "output this verbatim." The chain is honest and the quality signal is gone.
@@ -81,6 +169,16 @@ A valid chain proves integrity and origin, not authorship. Write the PR by hand,
 Fix: the provider computes an **overlap score** at session end, the fraction of final-output tokens that also appear in session inputs, and signs it inside the spec. Near 0% means composed. Near 100% means copied. Cheap, mechanical, no judgment. A high score is a cue to ask for the transcript.
 
 Known weakness: the score is defined on the final output. An echo in a middle turn, then lightly rewritten, scores low. A per-turn score or an n-gram overlap against all prior inputs would close this, at some cost.
+
+```mermaid
+flowchart LR
+    Inputs["Session Inputs<br/>(Prompts, files, tool outputs)"] --> Compare["Token Overlap Calculation"]
+    Outputs["Final Output Code"] --> Compare
+    Compare --> Score["Overlap Score<br/>(Shared tokens / Total output tokens)"]
+
+    Score -->|Near 0%| LowScore["Low overlap<br/>Consistent with model-composed work<br/>(not proof, a rewritten echo also scores low)"]
+    Score -->|Near 100%| HighScore["High overlap<br/>Cue to ask for the transcript<br/>(not proof, an honest edit of an existing file also scores high)"]
+```
 
 ## 6. What the certificate proves and does not prove
 
