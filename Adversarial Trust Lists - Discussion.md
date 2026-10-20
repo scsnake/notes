@@ -1,7 +1,7 @@
 ---
 title: 信任名單的對抗攻擊與防禦：跨領域的理論與實證 (Adversarial Attacks on Trust Lists - Theory and Evidence Across Fields)
 date: 2026-10-19
-updated: 2026-10-19
+updated: 2026-10-20
 tags:
   - trust
   - reputation-systems
@@ -14,25 +14,27 @@ aliases:
   - 信任名單攻擊
   - Trust List Attacks
   - Adversarial Trust Systems
-status: draft
+status: published
 ---
 
 # 信任名單的對抗攻擊與防禦 (Adversarial Attacks on Trust Lists)
 
-> [!abstract] 摘要
+> [!NOTE]
+> **摘要**
 > 本文討論一個抽象情境：一個群體有一份「信任名單」與排序。一群人想破壞它，手法有四種：（1）先照規則爬升，之後背叛；（2）建立多個假身分互相背書；（3）利用系統內建的檢舉與懲罰機制，打擊原本可信的成員；（4）在名單內部做壞事，讓外界相信「整份名單、甚至整個信任制度都不可信」。
 >
-> 本文以 Gemini 的初步分析為架構，加上 Claude 的查證研究，並補上三件事：有沒有專門研究這個問題的單一學科；這個抽象模型可套用到哪些領域；以及歷史事件、生物演化與實驗中的實際結果。
+> 本文補上三件事：有沒有專門研究這個問題的單一學科；這個抽象模型可套用到哪些領域；以及歷史事件、生物演化與實驗中的實際結果。
 >
 > 主要結論：
 > - 在本文的搜尋範圍內，沒有找到一個涵蓋四種攻擊的單一學科。最接近的是電腦科學的「信任與聲譽系統」安全研究，它的攻擊分類涵蓋前三種攻擊。[R1][R4] 第四種攻擊（破壞制度的正當性）主要出現在情報史、政治學與新聞研究。（推論）
 > - 幾個理論結果在各自的假設下指向同一件事：防禦無法完美。沒有邏輯上集中的權威時，女巫攻擊在實務上總是可能。[R16] 沒有一種對稱的聲譽函數能抵抗女巫攻擊。[R18] 在美國國家研究委員會的測謊篩檢例子中，被標記的人幾乎都是無辜者。[R21]
 > - 生物與歷史的例子可作為類比（不是直接證據），它們呈現同一種取捨：防禦越嚴，越容易誤傷自己人。免疫系統需要調節性 T 細胞「踩煞車」[R80]；宿主鳥類拒絕杜鵑蛋時，也要承擔辨識錯誤的代價。[R95]
-> - 常見的防禦機制多有實際使用的例子，例如以根節點錨定信任、k-of-n 共同簽署、雙訊號確認、透明紀錄；但多數缺少比較效果的研究。「沿擔保鏈追究擔保者」在潛伏型攻擊中會懲罰被騙的擔保者（例如 XZ 案的原維護者），也可能被刻意利用；若「揭穿」本身來自不完美的篩檢，誤傷會大量放大。（推論）
+> - 常見的防禦機制多有實際使用的例子，例如以根節點錨定信任、k-of-n 共同簽署、雙訊號確認、透明紀錄；但多數缺少比較效果的研究。「沿擔保鏈追究擔保者」在潛伏型攻擊中會懲罰被騙的擔保者（例如 XZ 案的原維護者），也可能被刻意利用；若「揭穿」本身來自不完美的篩檢，誤傷會大量放大。（推論，見 6 節）
 > - 延伸討論：生成式 AI 讓假身分與假證據更便宜，但來源標記不能證明內容為真（6.12 節）；本文沒有找到「快速公開清除會提高信任」的直接研究，現有研究顯示程序公平與結果認同較重要（6.13 節）；多份名單只有在治理彼此獨立時才互相制衡（6.14 節）；是否採取行動，取決於誤罰與漏罰的成本比（6.15 節）。
-> - 依情境而定的設計假設：信任依領域分開、權限要多人共同核可、懲罰需要真正獨立的第二證據、處罰證實的惡意檢舉並限制大量的無據檢舉、處分可以申訴、處理過程在保護隱私的前提下公開。（未驗證提案）
+> - 依情境而定的設計假設：信任依領域分開、權限要多人共同核可、懲罰需要真正獨立的第二證據、處罰證實的惡意檢舉並限制大量的無據檢舉、處分可以申訴、處理過程在保護隱私的前提下公開。（未驗證提案，見 8 節）
 
-> [!info] 如何閱讀
+> [!NOTE]
+> **如何閱讀**
 > - 每個論點後的 [Rxx] 對應第 10 節的參考資料。
 > - 「（推論）」表示作者根據證據所做的判斷，沒有直接資料支持。
 > - 「（未驗證提案）」表示構想，尚未經過實施或研究驗證。
@@ -41,14 +43,15 @@ status: draft
 > - 資料截至 2026-10-19。重要決策前，請閱讀原始來源。
 > - 本文的架構與多數防禦構想來自 Gemini 的初步回答，由 Claude Opus 5.5 查證、補充與撰寫。參考資料由 GPT-5.6 Sol（透過 Codex）查核；論證與延伸建議由 GPT-5.6 Sol 與 Gemini 4 Argon（透過 agy）審閱。LLM 也會出錯，請以原始來源為準。
 
-> [!note] 名詞
-> - **信任名單 (trust list)：** 一份「誰可信、可信到什麼程度」的清單或排序。例子：瀏覽器內建的根憑證清單、網拍賣家評價、開源專案的維護者名單、情報機關的安全查核名單。
-> - **女巫攻擊 (Sybil attack)：** 一個操作者控制多個身分，假裝是多個獨立參與者。[R16]
-> - **拜占庭錯誤 (Byzantine fault)：** 系統中有成員可能說謊、送出互相矛盾的訊息，而且不知道是誰。[R17]
-> - **信任錨點 (trust anchor)：** 系統預設信任的少數起點，例如根憑證、預先信任的節點。
-> - **擔保 (vouching)：** 既有成員為新成員作保，讓新成員取得信任。
-> - **正當性 (legitimacy)：** 大眾相信一個制度值得服從、值得信任的程度。
-> - **誣告 (calumnia, malicious accusation)：** 明知不實而提出的指控。
+> [!NOTE]
+> **名詞**
+> - **信任名單（trust list）：** 一份「誰可信、可信到什麼程度」的清單或排序。例子：瀏覽器內建的根憑證清單、網拍賣家評價、開源專案的維護者名單、情報機關的安全查核名單。
+> - **女巫攻擊（Sybil attack）：** 一個操作者控制多個身分，假裝是多個獨立參與者。[R16]
+> - **拜占庭錯誤（Byzantine fault）：** 系統中有成員可能說謊、送出互相矛盾的訊息，而且不知道是誰。[R17]
+> - **信任錨點（trust anchor）：** 系統預設信任的少數起點，例如根憑證、預先信任的節點。
+> - **擔保（vouching）：** 既有成員為新成員作保，讓新成員取得信任。
+> - **正當性（legitimacy）：** 大眾相信一個制度值得服從、值得信任的程度。
+> - **誣告（calumnia, malicious accusation）：** 明知不實而提出的指控。
 
 ---
 
@@ -65,22 +68,23 @@ status: draft
 
 ### 1.2 四種攻擊的名稱與分類
 
-這四種行為在電腦科學、賽局理論、反情報與免疫學中，都有對應的研究概念：潛伏者／開關攻擊 (on-off attack)、女巫攻擊加串通、惡意差評攻擊 (bad-mouthing)、假旗行動／拜占庭顛覆 (false flag / Byzantine subversion)。下表整理它們的常見名稱、被利用的弱點，以及電腦科學聲譽系統綜述中常被引用的分類。[R1]
+這四種行為在電腦科學、賽局理論、反情報與免疫學中，都有對應的研究概念：潛伏者／開關攻擊（on-off attack）、女巫攻擊加串通、惡意差評攻擊（bad-mouthing）、假旗行動／拜占庭顛覆（false flag / Byzantine subversion）。下表整理它們的常見名稱、被利用的弱點，以及電腦科學聲譽系統綜述中常被引用的分類。[R1]
 
 | 攻擊 | 常見名稱 | 被利用的弱點 | 聲譽系統文獻的分類 [R1] | 生物學的對應 | 歷史的對應 |
 |---|---|---|---|---|---|
-| 1. 先守規則爬升，再背叛 | 潛伏者、開關攻擊、刷信任 (trust farming) | 信任線性累積：先「存」信任，換取日後高影響的背叛 | 自我抬升 (self-promoting)；隊伍輪流誠實與不誠實的「振盪」屬於協同攻擊 (orchestrated) | 清潔魚在沒有旁觀者時偷咬客戶 [R86]；卷尾鳥混用可靠的警報與假警報，趁機偷食物 [R100] | 臥底升到領導層（Azef、Malinovsky）[R115][R116] |
-| 2. 多重身分互相背書 | 女巫攻擊加串通、連結農場 | 建立身分的成本低；排名演算法只數連結 | 協同攻擊；女巫攻擊 [R16] | 開普蜂的單一無性繫入侵其他蜂群 [R91]；假綠鬍子 (falsebeard) [R98] | 審稿圈以假身分互審 [R65] |
-| 3. 利用懲罰機制打擊誠實成員 | 惡意差評、懲罰濫用 (slashing griefing) | 指控沒有成本；處分由自動或多數決觸發 | 誹謗 (slandering) | （類比）分子擬態讓免疫系統攻擊自身組織 [R81][R82] | FBI 把真正的社運成員栽贓成線民（snitch jacket）[R117] |
-| 4. 讓人相信整個制度不可信 | 假旗、拜占庭顛覆 | 把個人的高排名等同於永久的道德無瑕 | 這份分類中沒有直接對應；最接近的可能是阻斷服務 (denial of service)（推論） | （類比）HIV 摧毀協調免疫反應的 CD4 細胞；在淋巴組織的實驗模型中，大多數 CD4 細胞的死亡是宿主細胞自身的發炎性死亡（焦亡）[R85] | Azef 曝光重創社會革命黨的士氣 [R115] |
+| 1. 先守規則爬升，再背叛 | 潛伏者、開關攻擊、刷信任（trust farming） | 信任線性累積：先「存」信任，換取日後高影響的背叛 | 自我抬升（self-promoting）；隊伍輪流誠實與不誠實的「振盪」屬於協同攻擊（orchestrated） | 清潔魚在沒有旁觀者時偷咬客戶 [R86]；卷尾鳥混用可靠的警報與假警報，趁機偷食物 [R100] | 臥底升到領導層（Azef、Malinovsky）[R115][R116] |
+| 2. 多重身分互相背書 | 女巫攻擊加串通、連結農場 | 建立身分的成本低；排名演算法只數連結 | 協同攻擊；女巫攻擊 [R16] | 開普蜂的單一無性繫入侵其他蜂群 [R91]；假綠鬍子（falsebeard） [R98] | 審稿圈以假身分互審 [R65] |
+| 3. 利用懲罰機制打擊誠實成員 | 惡意差評、懲罰濫用（slashing griefing） | 指控沒有成本；處分由自動或多數決觸發 | 誹謗（slandering） | （類比）分子擬態讓免疫系統攻擊自身組織 [R81][R82] | FBI 把真正的社運成員栽贓成線民（snitch jacket）[R117] |
+| 4. 讓人相信整個制度不可信 | 假旗、拜占庭顛覆 | 把個人的高排名等同於永久的道德無瑕 | 這份分類中沒有直接對應；最接近的可能是阻斷服務（denial of service）（推論） | （類比）HIV 摧毀協調免疫反應的 CD4 細胞；在淋巴組織的實驗模型中，大多數 CD4 細胞的死亡是宿主細胞自身的發炎性死亡（焦亡）[R85] | Azef 曝光重創社會革命黨的士氣 [R115] |
 
 表中的生物與歷史欄是類比。結果相似，不代表機制相同：分子擬態不是病原體「為了陷害」而演化的策略；HIV 也沒有需要說服的「旁觀者」。（推論）
 
 要同時防禦四種攻擊，需要分層的設計，借用圖論、賽局與機制設計、零信任資安與免疫學的概念（第 6 節）。
 
-聲譽系統文獻還列出兩種上述情境沒有提到的攻擊：洗白 (whitewashing)，也就是利用漏洞修復自己的聲譽（例如註冊新帳號重來）；以及阻斷服務，也就是讓聲譽值算不出來或傳不出去。[R1]
+聲譽系統文獻還列出兩種上述情境沒有提到的攻擊：洗白（whitewashing），也就是利用漏洞修復自己的聲譽（例如註冊新帳號重來）；以及阻斷服務，也就是讓聲譽值算不出來或傳不出去。[R1]
 
-> [!tip] 第五種情況：攻擊信任錨點
+> [!TIP]
+> **第五種情況：攻擊信任錨點**
 > 攻擊者也可以直接攻擊「信任錨點」本身：入侵根憑證機構、竊取簽章金鑰、掌控選舉機關。見 4.5 節。以根節點錨定信任的設計（6.1 節），也讓根節點變成最有價值的目標。（推論）
 
 ### 1.3 比較框架：同名，但不同物
@@ -96,7 +100,8 @@ status: draft
 
 七個要素：身分（誰）、訊號（憑什麼被信任）、決策規則（誰決定、怎麼決定）、資源（信任換到什麼）、制裁（犯錯的代價）、攻擊者（目的與能力）、觀眾（誰的信念會被改變）。
 
-> [!info] 證據類型
+> [!NOTE]
+> **證據類型**
 > 第 6 節為每個防禦標示證據類型，由強到弱大致為：實地評估（有比較組）＞實驗（實驗室）＞實務使用（有用過，但沒有比較組）＞模擬或定理（在假設下成立）＞類比（其他領域的相似現象）。「用了很久」不等於「證明有效」。
 
 ---
@@ -107,7 +112,7 @@ status: draft
 
 在本文的搜尋範圍內，沒有找到一個專門研究這四種攻擊、並有自己學會與期刊的單一學科。這是搜尋結果，不能證明不存在。
 
-最接近的是電腦科學的「信任管理」(trust management) 與「聲譽系統」(reputation systems)。IFIP 的信任管理工作小組 (WG 11.11) 自我描述為跨領域論壇，結合技術領域與「法律、社會科學與哲學」。[R4] 這個領域的綜述文獻整理了攻擊分類（1.2 節）。[R1][R2][R3]
+最接近的是電腦科學的「信任管理」（trust management）與「聲譽系統」（reputation systems）。IFIP 的信任管理工作小組（WG 11.11）自我描述為跨領域論壇，結合技術領域與「法律、社會科學與哲學」。[R4] 這個領域的綜述文獻整理了攻擊分類（1.2 節）。[R1][R2][R3]
 
 其他領域各自研究問題的一部分：
 
@@ -126,11 +131,13 @@ status: draft
 | 信任與安全（Trust & Safety，產業專業） | 平台的濫用與審查 | 2、3 | TSPA（2020 成立）；《Journal of Online Trust and Safety》(2021 創刊) | [R9][R10] |
 | 人工免疫系統（電腦科學借用免疫學） | 以「自我／非我」辨識偵測入侵 | 1、2 | Forrest 等 1994、1997 | [R12][R13] |
 
-### 2.2 推論
+### 2.2 關鍵事實與推論
 
-- 四種攻擊分散在不同領域，是因為「信任名單」在各領域長得不一樣：在電腦裡是演算法，在生物裡是辨識分子，在組織裡是人事與情報制度。（推論）
-- 第四種攻擊（打擊制度正當性）最少被電腦科學處理。它的對象是「人們對制度的信念」，不是系統的計算結果。相關證據主要來自情報史（第 4.4 節）、選舉與新聞研究。（推論）
-- 若要用一個名稱概括，「對抗環境下的信任機制設計」比較接近，但這不是一個既有的學科名稱。（推論）
+| 主題 | 事實 | 推論 | 來源 |
+|---|---|---|---|
+| 是否有單一學科 | 本文的搜尋範圍內，沒有找到專門研究這四種攻擊、並有自己學會與期刊的學科；最接近的是信任管理與聲譽系統 | 若要用一個名稱概括，「對抗環境下的信任機制設計」比較接近，但這不是既有的學科名稱 | [R1][R4] |
+| 為何分散 | 各領域各自研究其中幾種攻擊（2.1 節的表） | 「信任名單」在各領域長得不一樣：在電腦裡是演算法，在生物裡是辨識分子，在組織裡是人事與情報制度 | [R1][R16][R17] |
+| 第四種攻擊 | 電腦科學的信任與聲譽文獻主要涵蓋攻擊 1–3；攻擊 4 出現在信任社會學與內部威脅研究（2.1 節的表） | 打擊制度正當性的攻擊最少被電腦科學處理；它的對象是「人們對制度的信念」，證據主要來自情報史（4.4 節）、選舉與新聞研究 | [R1][R11][R14] |
 
 ---
 
@@ -156,7 +163,7 @@ Levien 與 Aiken (1998) 提出以網路流量計算信任的方法，用於 Advo
 
 ### 3.3 稀少的內鬼：基本比率問題
 
-美國國家研究委員會 (NRC) 2003 年的測謊報告舉例：篩檢 10,000 名員工，其中 10 名是間諜。若門檻設在能抓到約 8 名間諜，「約 1,600 人沒通過，幾乎全部是無辜者」；若門檻設在只有約 40 名無辜者沒通過，則只能抓到 2 名間諜，漏掉 8 名。[R21] 報告表格中的精確數字是 1,598 人與 39 人，下面的模型採用精確數字。
+美國國家研究委員會（NRC） 2003 年的測謊報告舉例：篩檢 10,000 名員工，其中 10 名是間諜。若門檻設在能抓到約 8 名間諜，「約 1,600 人沒通過，幾乎全部是無辜者」；若門檻設在只有約 40 名無辜者沒通過，則只能抓到 2 名間諜，漏掉 8 名。[R21] 報告表格中的精確數字是 1,598 人與 39 人，下面的模型採用精確數字。
 
 入侵偵測也有同樣的問題。Axelsson (2000) 計算：即使偵測率是 100%，誤報率也必須低到約十萬分之一，警報才有約 66% 的機率是真的。[R20]
 
@@ -172,7 +179,8 @@ Levien 與 Aiken (1998) 提出以網路流量計算信任的方法，用於 Advo
 
 **情況二：「揭穿」來自不完美的篩檢。** 本文用 NRC 的數字做了一個示意模型，並加入往回追究：每個被標記的人，連同為他作保的 k 個人一起處分。
 
-> [!info] 公式與假設（估算）
+> [!NOTE]
+> **公式與假設（估算）**
 > - 真陽性 TP = 敏感度 × 間諜數；偽陽性 FP = 偽陽性率 × 無辜者數；被標記者 F = TP + FP。
 > - 陽性預測值 PPV = TP ÷ F。
 > - 假設每個人有 k 名擔保者，從其他成員中隨機產生（隨機圖，不考慮真實網路的群聚）。
@@ -212,7 +220,7 @@ Goodhart (1975)：「任何觀察到的統計規律，一旦被施壓用於控�
 
 Slovic (1993) 發現，負面事件對信任的影響遠大於正面事件，稱為「不對稱原則」。[R27] 後續研究指出，這種不對稱在低風險議題與政策層級的資訊上較弱。[R27]
 
-Chesney 與 Citron (2019) 提出「說謊者紅利」(liar's dividend)：大眾越了解深偽，越容易懷疑真實的證據，說謊者就越容易逃避責任。原文：「這個紅利會反常地隨著『教育大眾認識深偽』的成功程度而增加」。[R28]
+Chesney 與 Citron (2019) 提出「說謊者紅利」（liar's dividend）：大眾越了解深偽，越容易懷疑真實的證據，說謊者就越容易逃避責任。原文：「這個紅利會反常地隨著『教育大眾認識深偽』的成功程度而增加」。[R28]
 
 推論：第四種攻擊的槓桿很大。少數醜聞就能抵銷長期的良好紀錄。而且教育大眾「要懷疑」，本身也可能被攻擊者利用。（推論）
 
@@ -220,7 +228,8 @@ Chesney 與 Citron (2019) 提出「說謊者紅利」(liar's dividend)：大眾�
 
 ## 4. 四種攻擊的實際案例
 
-> [!warning] 範圍限制
+> [!WARNING]
+> **範圍限制**
 > - 以下案例經過挑選，用來說明攻擊手法。它們不是完整清單，也不代表各類攻擊的發生頻率。
 > - 只部分符合該類攻擊的案例，標為「（部分類比）」。生物案例標為「（類比）」，不是社會制度的直接證據。
 > - 被揭穿的攻擊才會留下紀錄，所以這些案例有倖存者偏差：沒被發現的攻擊不在表中。
@@ -236,7 +245,7 @@ Chesney 與 Citron (2019) 提出「說謊者紅利」(liar's dividend)：大眾�
 | 革命政黨 | Yevno Azef | 俄國秘密警察的線人，卻成為社會革命黨戰鬥組織的領導人，策劃了 1904 年刺殺內政部長 Plehve。1908–1909 年被揭穿。 | [R115] |
 | 革命政黨 | Roman Malinovsky | 秘密警察的線人，1912 年進入布爾什維克中央委員會並當選國會議員。列寧曾為他辯護，稱指控是「誹謗」。1917 年警方檔案公開後確認身分，1918 年被處決。 | [R116] |
 | 動物（類比） | 清潔魚 *Labroides dimidiatus* | 清潔魚偏好吃客戶的黏液（等於欺騙），但有旁觀者時會表現得更合作。 | [R86] |
-| 動物（類比） | 叉尾卷尾 (fork-tailed drongo) | 同時使用可靠的警報與欺騙性的假警報。假警報與真警報在結構上無法區分，狐獴或斑鶇鶥聽到後逃走，卷尾就搶走食物。 | [R100][R102] |
+| 動物（類比） | 叉尾卷尾（fork-tailed drongo） | 同時使用可靠的警報與欺騙性的假警報。假警報與真警報在結構上無法區分，狐獴或斑鶇鶥聽到後逃走，卷尾就搶走食物。 | [R100][R102] |
 
 推論：
 - XZ 案顯示，攻擊者願意花兩年以上「養」信任。單純的「信任成長速度上限」擋不住有耐心的攻擊者。（推論）
@@ -251,21 +260,21 @@ Chesney 與 Citron (2019) 提出「說謊者紅利」(liar's dividend)：大眾�
 | 學術出版 | SAGE《Journal of Vibration and Control》（2014） | 經 14 個月調查，撤回 60 篇論文。Peter Chen 在投稿系統建立多個化名，至少一次審查了自己的論文。 | [R65] |
 | 學術出版 | Hyung-In Moon（2012） | 用假的或轉寄的審稿人信箱，自己審自己的論文，導致 28 篇撤稿。 | [R66] |
 | 學術出版 | Hindawi 特刊（2023） | 因「審稿流程可能遭破壞」撤回超過 8,000 篇論文，多數來自特刊。 | [R67] |
-| 學術出版 | 引用堆疊 (citation stacking) | 2013 年 14 份期刊的影響係數被停止一年，其中 4 份來自巴西。 | [R68] |
+| 學術出版 | 引用堆疊（citation stacking） | 2013 年 14 份期刊的影響係數被停止一年，其中 4 份來自巴西。 | [R68] |
 | 網路評論 | 臉書上的假評論市場 | 買假評論的商品，評分與銷售排名短期上升，約一個月後效果消失，之後評分下降、一星評論變多。 | [R62] |
 | 網路評論 | Yelp | 約 16% 的餐廳評論被過濾。聲譽較弱時，造假的可能性較高。 | [R63] |
 | 匿名網路 | Tor 的 KAX17 中繼站 | 高峰時控制超過 900 個中繼站（全網約 9,000–10,000 個），使用者有 16% 機率選到它的入口節點。Tor 專案在 2021 年移除。沒有證據顯示實際去匿名化。 | [R53] |
 | 區塊鏈（部分類比：算力多數，不是身分複製） | 以太坊經典 51% 攻擊（2020） | 攻擊者租用算力，重組約 3,615 個區塊，雙重花費 807,260 ETC（約 560 萬美元）。 | [R57] |
-| 加密貨幣交易所（部分類比：自買自賣製造假的交易量） | 洗量交易 (wash trading) | 研究 29 家交易所：未受監管的交易所中，洗量平均占回報交易量七成以上。 | [R171] |
+| 加密貨幣交易所（部分類比：自買自賣製造假的交易量） | 洗量交易（wash trading） | 研究 29 家交易所：未受監管的交易所中，洗量平均占回報交易量七成以上。 | [R171] |
 | 選舉（部分類比：灌票是製造假的多數，不是互相背書） | 俄羅斯 2011–2012 選舉 | 統計研究發現開票數據的「指紋」與系統性灌票相符；2011 年約 3,000 個開票所回報 100% 投給統一俄羅斯黨。 | [R135] |
-| 社群網路 | 人人網 (Renren) | 研究偵測到超過 10 萬個假帳號。假帳號「並未形成緊密社群，而是像一般使用者一樣融入社交圖」。 | [R33] |
-| 蜜蜂（類比） | 開普蜂 (*Apis mellifera capensis*) | 1990 年起，開普蜂工蜂以孤雌生殖產生近乎無性繫的後代，大規模入侵非洲蜂蜂群，每年造成數千群損失。全部寄生工蜂都帶有「單一祖先工蜂」的遺傳特徵，分布約 275,000 平方公里。 | [R91] |
-| 螞蟻（類比） | 霾灰蝶 (*Phengaris/Maculinea rebeli*) | 幼蟲合成並吸收宿主螞蟻的體表碳氫化合物，成為宿主蟻巢氣味的「近乎完美的擬態者」；還模仿蟻后的聲音，取得高地位。 | [R92][R93] |
-| 黏菌（類比） | 盤基網柄菌 (*Dictyostelium*) | 聚集後前端 20% 的細胞犧牲成為柄。混合不同品系時，一半的組合出現明確的騙子與受害者。 | [R97] |
+| 社群網路 | 人人網（Renren） | 研究偵測到超過 10 萬個假帳號。假帳號「並未形成緊密社群，而是像一般使用者一樣融入社交圖」。 | [R33] |
+| 蜜蜂（類比） | 開普蜂（*Apis mellifera capensis*） | 1990 年起，開普蜂工蜂以孤雌生殖產生近乎無性繫的後代，大規模入侵非洲蜂蜂群，每年造成數千群損失。全部寄生工蜂都帶有「單一祖先工蜂」的遺傳特徵，分布約 275,000 平方公里。 | [R91] |
+| 螞蟻（類比） | 霾灰蝶（*Phengaris/Maculinea rebeli*） | 幼蟲合成並吸收宿主螞蟻的體表碳氫化合物，成為宿主蟻巢氣味的「近乎完美的擬態者」；還模仿蟻后的聲音，取得高地位。 | [R92][R93] |
+| 黏菌（類比） | 盤基網柄菌（*Dictyostelium*） | 聚集後前端 20% 的細胞犧牲成為柄。混合不同品系時，一半的組合出現明確的騙子與受害者。 | [R97] |
 
 推論：
 - 在學術出版與網路評論中，攻擊者利用的是「審查者的身分難以驗證」與「評分只看數量」。（推論）
-- 人人網的研究很重要：它顯示真實的假帳號不一定形成緊密群聚。以「圖導度」(graph conductance) 偵測女巫群聚的方法（6.2 節），依賴的正是這個假設。[R33][R34]（推論）
+- 人人網的研究很重要：它顯示真實的假帳號不一定形成緊密群聚。以「圖導度」（graph conductance）偵測女巫群聚的方法（6.2 節），依賴的正是這個假設。[R33][R34]（推論）
 - 開普蜂與霾灰蝶顯示，生物的「名單」（氣味、聲音）也會被複製。演化的回應是持續的軍備競賽，不是一次性的解決。[R94]
 
 ### 4.3 攻擊三：利用檢舉與懲罰機制，打擊誠實的成員
@@ -277,12 +286,12 @@ Chesney 與 Citron (2019) 提出「說謊者紅利」(liar's dividend)：大眾�
 | 加密社群 | PGP 金鑰伺服器洪泛（2019 年 6 月） | 攻擊者在兩位知名維護者的公鑰上附加近 15 萬個簽章。金鑰伺服器的設計是「永遠不刪除資訊」，所以被汙染的憑證無法刪除；下載它會讓 GnuPG 壞掉。 | [R52] |
 | 著作權 | 下架通知濫用 | 研究抽樣 Lumen 資料庫的通知：近 30% 有疑問，約 4% 根本有誤（目標與主張的作品不符）。 | [R69] |
 | 社群平台 | 巴基斯坦帳號網路的大量檢舉（2020） | 該網路用名為「Auto Reporter」的瀏覽器外掛大量檢舉批評者。臉書移除了 103 個粉專、78 個社團、453 個帳號。研究者無法確認是檢舉造成下架。 | [R70] |
-| 國際執法 | 國際刑警紅色通緝令 | 歐洲委員會議會 2017 年決議指出，紅色通緝令被用來追捕海外的政治反對者。國際刑警 2015 年起採行難民政策，並強化檔案監督委員會 (CCF)。 | [R129][R130] |
+| 國際執法 | 國際刑警紅色通緝令 | 歐洲委員會議會 2017 年決議指出，紅色通緝令被用來追捕海外的政治反對者。國際刑警 2015 年起採行難民政策，並強化檔案監督委員會（CCF）。 | [R129][R130] |
 | 新聞 | 「假新聞」法 | 2024 年 12 月 1 日全球有 361 名記者入獄，超過 65% 面臨假新聞、恐怖主義等「反國家」罪名。馬來西亞 2018 年《反假新聞法》的首例定罪，對象是批評警方應變的 YouTube 影片作者；該法 2019 年廢止。 | [R149][R150][R151] |
-| 金融監理 | Wirecard（2019–2020） | 德國金融監理局 (BaFin) 2019 年以「市場信心」為由，首次對單一公司禁止放空；並提出刑事告發，對象包括報導疑點的《金融時報》記者。2020 年證實 19 億歐元現金「很可能不存在」；檢方後來撤銷對記者的案件。 | [R168][R169] |
+| 金融監理 | Wirecard（2019–2020） | 德國金融監理局（BaFin） 2019 年以「市場信心」為由，首次對單一公司禁止放空；並提出刑事告發，對象包括報導疑點的《金融時報》記者。2020 年證實 19 億歐元現金「很可能不存在」；檢方後來撤銷對記者的案件。 | [R168][R169] |
 | 網拍 | eBay 的報復性評價 | 研究發現，買家給評價時，賣家給評價的比例為 87.4%；買家沒給時為 51.4%。eBay 2008 年起不再讓賣家給買家負評，理由是買家「害怕報復性評價」。 | [R61] |
-| 實驗 | 反社會懲罰 (antisocial punishment) | 16 個地區的公共財實驗：有些地區懲罰高貢獻者，和懲罰低貢獻者一樣多；在部分地區，這足以抵銷懲罰提升合作的效果。公民合作規範弱、法治弱的國家，反社會懲罰較多。 | [R104] |
-| 免疫（類比） | 分子擬態 (molecular mimicry) | A 群鏈球菌與心臟、腦組織的分子相似，交叉反應的抗體與 T 細胞損傷心臟瓣膜，造成風濕熱。[R81] 空腸彎曲菌的脂寡糖模仿神經節苷脂，引發格林－巴利症候群；用細菌成分免疫兔子，可重現相同的神經病變。[R82] | [R81][R82] |
+| 實驗 | 反社會懲罰（antisocial punishment） | 16 個地區的公共財實驗：有些地區懲罰高貢獻者，和懲罰低貢獻者一樣多；在部分地區，這足以抵銷懲罰提升合作的效果。公民合作規範弱、法治弱的國家，反社會懲罰較多。 | [R104] |
+| 免疫（類比） | 分子擬態（molecular mimicry） | A 群鏈球菌與心臟、腦組織的分子相似，交叉反應的抗體與 T 細胞損傷心臟瓣膜，造成風濕熱。[R81] 空腸彎曲菌的脂寡糖模仿神經節苷脂，引發格林－巴利症候群；用細菌成分免疫兔子，可重現相同的神經病變。[R82] | [R81][R82] |
 | 鳥類（類比） | 大斑鳳頭鵑的「黑手黨」行為 | 喜鵲把杜鵑蛋丟出巢後，巢被破壞的比例明顯升高；破壞者正是下蛋的杜鵑。這迫使部分喜鵲重新築巢並接受杜鵑蛋。 | [R96] |
 
 推論：
@@ -304,10 +313,10 @@ Chesney 與 Citron (2019) 提出「說謊者紅利」(liar's dividend)：大眾�
 | 領域 | 案例 | 經過與結果 | 來源 |
 |---|---|---|---|
 | 革命政黨 | Azef 曝光 | 【醜聞放大】學者描述，曝光對社會革命黨，尤其是戰鬥組織的士氣，是「毀滅性的打擊」。 | [R115] |
-| 情報 | 「托拉斯行動」(Operation Trust, 1921–1927) | 【冒充】蘇聯秘密警察建立（或接管，史家仍有爭議）一個假的反布爾什維克組織，為了取信流亡團體，甚至提供真實的幫助（例如協助人員出境）。英國特工 Sidney Reilly 1925 年經由該組織的「通道」入境後一去不返。1927 年組織的財務負責人叛逃，揭露它受秘密警察控制；他的動機當時就受到懷疑。另一位流亡領袖 Savinkov 則是被另一個類似行動「Syndicate-2」誘回。 | [R114] |
+| 情報 | 「托拉斯行動」（Operation Trust, 1921–1927） | 【冒充】蘇聯秘密警察建立（或接管，史家仍有爭議）一個假的反布爾什維克組織，為了取信流亡團體，甚至提供真實的幫助（例如協助人員出境）。英國特工 Sidney Reilly 1925 年經由該組織的「通道」入境後一去不返。1927 年組織的財務負責人叛逃，揭露它受秘密警察控制；他的動機當時就受到懷疑。另一位流亡領袖 Savinkov 則是被另一個類似行動「Syndicate-2」誘回。 | [R114] |
 | 開源軟體 | 明尼蘇達大學「偽善提交」(2021) | 【內部破壞，接著是信任破裂】研究者以兩個假身分送出 5 個刻意含缺陷的修補，以研究審查漏洞。Linux 核心社群禁止該校所有貢獻，並重新審查該校 435 個提交：39 個有誤而撤回或替換。Linux 基金會報告寫道：「核心社群與明尼蘇達大學之間的信任已經破裂。」 | [R41][R42] |
 | 新聞 | 俄羅斯「Doppelganger」行動 | 【冒充】2022 年起複製至少 17 家媒體的網站（包括 Bild、The Guardian），發布假新聞。美國司法部 2024 年 9 月查扣 32 個網域。 | [R156][R157] |
-| 事實查核 | 假的事實查核 | 【冒充】2022 年的 Telegram 頻道「War on Fakes」兩週內約 62.5 萬訂閱，用事實查核的形式散播假訊息。[R154] 俄方 2024 年 11 月宣布、2025 年正式上線「全球事實查核網路」(GFCN)，被視為對應國際事實查核聯盟 (IFCN) 的平行組織。[R155] | [R154][R155] |
+| 事實查核 | 假的事實查核 | 【冒充】2022 年的 Telegram 頻道「War on Fakes」兩週內約 62.5 萬訂閱，用事實查核的形式散播假訊息。[R154] 俄方 2024 年 11 月宣布、2025 年正式上線「全球事實查核網路」（GFCN），被視為對應國際事實查核聯盟（IFCN）的平行組織。[R155] | [R154][R155] |
 | 選舉 | 美國 2020 年大選 | 【錯誤歸因】聯邦與各州選務協調機構聯合聲明：「11 月 3 日的選舉是美國史上最安全的一次」，「沒有證據顯示任何投票系統刪除、遺失或更改選票」。法學期刊整理：在 12 州超過 60 件案件中，法官都認定對選舉結果的挑戰不成立。 | [R139][R140] |
 | 選舉 | 台灣 2024 年大選 | 【錯誤歸因】網路流傳「作票」影片。中選會多次發布澄清，並移送 25 件選舉謠言案。台灣事實查核中心查核了兩支影片：台南東區一處開票所的影片有兩處剪接痕跡，選民另外反映的計票錯誤已經更正；桃園新屋一處開票所確有記票錯誤，但當場更正，最終票數正確，影片只截取了錯誤的片段。 | [R141][R142][R143] |
 | 社會運動 | 加拿大 Montebello 抗議（2007） | 【疑似挑撥，未有定論】魁北克省警方承認有三名員警喬裝成示威者。工會領袖指出其中一人拿著石頭。警方表示目的是找出非和平的示威者，不是煽動。是否構成挑撥，沒有定論。 | [R131] |
@@ -324,8 +333,8 @@ Chesney 與 Citron (2019) 提出「說謊者紅利」(liar's dividend)：大眾�
 
 | 領域 | 案例 | 經過與結果 | 來源 |
 |---|---|---|---|
-| 網路憑證 | DigiNotar（2011） | 入侵者簽發至少 531 張偽造憑證，用於監聽約 30 萬名使用者，幾乎全在伊朗。Chrome 靠憑證釘選 (pinning) 偵測到異常，各瀏覽器隨後移除對 DigiNotar 的信任，公司同年破產。 | [R44][R45] |
-| 網路憑證 | Symantec（2015–2018） | 透過憑證透明度 (Certificate Transparency) 日誌，Google 發現 Symantec 旗下機構未經授權簽發 google.com 的憑證。後續又揭露數千張問題憑證。Chrome 66–70 分階段停止信任 Symantec 的舊基礎設施。 | [R47][R48][R49] |
+| 網路憑證 | DigiNotar（2011） | 入侵者簽發至少 531 張偽造憑證，用於監聽約 30 萬名使用者，幾乎全在伊朗。Chrome 靠憑證釘選（pinning）偵測到異常，各瀏覽器隨後移除對 DigiNotar 的信任，公司同年破產。 | [R44][R45] |
+| 網路憑證 | Symantec（2015–2018） | 透過憑證透明度（Certificate Transparency）日誌，Google 發現 Symantec 旗下機構未經授權簽發 google.com 的憑證。後續又揭露數千張問題憑證。Chrome 66–70 分階段停止信任 Symantec 的舊基礎設施。 | [R47][R48][R49] |
 | 網路憑證 | WoSign／StartCom（2016）、TrustCor（2022） | WoSign 被認定「明知且故意」錯誤簽發，並隱瞞收購 StartCom。TrustCor 因與間諜軟體公司的關聯被移除，沒有被證明錯誤簽發。 | [R50][R51] |
 | 身分系統 | Microsoft Storm-0558（2023） | 美國網路安全審查委員會報告：入侵源於 Microsoft「一連串的安全失誤」，「可以預防，而且不該發生」。被竊的是 2016 年的簽章金鑰。 | [R163] |
 | 軟體供應鏈 | SolarWinds Orion（2020） | 公司通知約 33,000 名客戶，估計「少於 18,000」名可能安裝了受影響的版本。 | [R160] |
@@ -347,9 +356,9 @@ Chesney 與 Citron (2019) 提出「說謊者紅利」(liar's dividend)：大眾�
 | 領域           | 「信任名單」是什麼                     | 已見的攻擊                                                            | 有實例的防禦                                                        | 來源                                   |
 | ------------ | ----------------------------- | ---------------------------------------------------------------- | ------------------------------------------------------------- | ------------------------------------ |
 | 技術認證與憑證      | 瀏覽器的根憑證清單；PGP 的信任網；企業的身分與權限系統 | 錨點入侵（DigiNotar）；簽章金鑰被竊（Storm-0558）；收買內部人員（Lapsus$）；PGP 金鑰洪泛（攻擊三） | 憑證透明度日誌；公開移除不可信的機構；DNSSEC 根金鑰的多人儀式；NIST 要求高保證等級使用防釣魚、不可匯出的驗證器 | [R44][R46][R52][R73][R163][R164]     |
-| 區塊鏈與加密貨幣     | 共識節點、驗證者、算力或質押                | 51% 攻擊（租用算力）；洗量交易；交易所內部挪用（FTX）；捐款的女巫攻擊                           | 以太坊的罰沒 (slashing) 與相關懲罰；Gitcoin 的群聚折減配對                       | [R55][R57][R58][R171][R172]          |
+| 區塊鏈與加密貨幣     | 共識節點、驗證者、算力或質押                | 51% 攻擊（租用算力）；洗量交易；交易所內部挪用（FTX）；捐款的女巫攻擊                           | 以太坊的罰沒（slashing）與相關懲罰；Gitcoin 的群聚折減配對                       | [R55][R57][R58][R171][R172]          |
 | 民主與選舉        | 選民名冊、選務人員、計票結果、選舉機關           | 灌票與重複投票；選舉機關被掌控（委內瑞拉）；「作票」謠言打擊正當性                                | 公開的計票單與拍照；風險限制稽核；不受軟體影響的紙本紀錄；國際觀察團；抽籤產生的公民會議                  | [R135][R136][R137][R138][R144][R146] |
-| 新聞與媒體        | 可信媒體、事實查核組織、記者證               | 媒體被收購整併（匈牙利 KESMA）；假新聞法用來起訴記者；複製媒體網站（Doppelganger）；假的事實查核網路      | 新聞信任倡議 (JTI) 的標準、自評與外部稽核認證；IFCN 的外部評審與定期更新                    | [R147][R149][R152][R153][R156]       |
+| 新聞與媒體        | 可信媒體、事實查核組織、記者證               | 媒體被收購整併（匈牙利 KESMA）；假新聞法用來起訴記者；複製媒體網站（Doppelganger）；假的事實查核網路      | 新聞信任倡議（JTI）的標準、自評與外部稽核認證；IFCN 的外部評審與定期更新                    | [R147][R149][R152][R153][R156]       |
 | 免疫學          | 「自我」的辨識：胸腺訓練、MHC 標記、共同刺激訊號    | 分子擬態；病毒隱藏 MHC 標記；HIV 摧毀協調細胞                                      | 雙訊號活化；「缺失自我」偵測；調節性 T 細胞抑制過度反應                                 | [R76][R81][R83][R84][R85][R80]       |
 | 商業交易與賽局      | 賣家評價、信用評等、簽證會計師、商人聯盟          | 假評論；報復性評價；信評機構失職；會計師失職                                           | eBay 的匿名單向評分；FTC 2024 年禁止假評論規則；長期重複互動與聲譽                      | [R61][R62][R64][R170][R110]          |
 | 開源軟體供應鏈      | 維護者與提交權限                      | 長期潛伏（XZ）；交接給陌生人（event-stream）；研究者故意送缺陷修補（明尼蘇達大學）                 | 公開審查與重新審查；發版簽章；社群公開事件報告                                       | [R35][R42][R43]                      |
@@ -392,8 +401,8 @@ Chesney 與 Citron (2019) 提出「說謊者紅利」(liar's dividend)：大眾�
 證據類型：實務使用（Gitcoin、社群筆記）。本文沒有找到比較效果的研究。
 
 事實：
-- Gitcoin 的「連結導向群聚配對」(connection-oriented cluster match, COCM)：如果某專案的許多捐款者彼此相似（共同參與、互相追蹤、捐款紀錄相近），就減少該專案的配對金額。[R58]
-- 社群筆記 (Community Notes) 採類似精神：要獲得過去意見不一致的評分者都認為有用，筆記才會顯示。[R60] 相關證據見另一篇筆記 [[Prosocial SNS Mechanism Design - Discussion]]。
+- Gitcoin 的「連結導向群聚配對」（connection-oriented cluster match, COCM）：如果某專案的許多捐款者彼此相似（共同參與、互相追蹤、捐款紀錄相近），就減少該專案的配對金額。[R58]
+- 社群筆記（Community Notes）採類似精神：要獲得過去意見不一致的評分者都認為有用，筆記才會顯示。[R60] 相關證據見另一篇筆記 [Prosocial SNS Mechanism Design - Discussion](Prosocial%20SNS%20Mechanism%20Design%20-%20Discussion.md)。
 
 與 4.2 節的關係：COCM 看的是捐款者的參與與捐款紀錄是否相似，不只是社交圖。但它同樣假設攻擊者的帳號彼此相似。人人網的結果提醒，攻擊者可以讓帳號看起來不相似。[R33]（推論）
 
@@ -407,8 +416,8 @@ Chesney 與 Citron (2019) 提出「說謊者紅利」(liar's dividend)：大眾�
 
 事實：
 - Lobsters 社群公開完整的邀請樹，說明這「提供某種程度的問責，並幫助辨識投票集團」。若被邀請者因垃圾訊息或分身被封鎖，管理員會考慮停用邀請者的邀請權，「少數情況」也會封鎖邀請者。[R59]
-- 以太坊的罰沒機制：違規的驗證者會被罰，並在約 18 天後依「同期被罰沒的總質押量」加罰。這是「同時犯錯的人越多，罰得越重」的設計。[R55] Buterin 用「騷擾係數」(griefing factor) 衡量：攻擊者每花 1 元，能讓受害者損失多少。[R56]
-- 中國秦代商鞅變法：「令民為什伍，而相牧司連坐。不告姦者腰斬，告姦者與斬敵首同賞，匿姦者與降敵同罰。」[R124] 宋代熙寧三年（1070 年）的保甲法以十家為一保，同保有人犯強盜、殺人等罪，「知而不告」者依伍保法處罰。[R125] 英格蘭的十戶聯保制 (frankpledge) 也讓約十人一組共同負責交出犯人。[R133]
+- 以太坊的罰沒機制：違規的驗證者會被罰，並在約 18 天後依「同期被罰沒的總質押量」加罰。這是「同時犯錯的人越多，罰得越重」的設計。[R55] Buterin 用「騷擾係數」（griefing factor）衡量：攻擊者每花 1 元，能讓受害者損失多少。[R56]
+- 中國秦代商鞅變法：「令民為什伍，而相牧司連坐。不告姦者腰斬，告姦者與斬敵首同賞，匿姦者與降敵同罰。」[R124] 宋代熙寧三年（1070 年）的保甲法以十家為一保，同保有人犯強盜、殺人等罪，「知而不告」者依伍保法處罰。[R125] 英格蘭的十戶聯保制（frankpledge）也讓約十人一組共同負責交出犯人。[R133]
 - Greif (1993) 主張，中世紀的馬格里布商人以集體懲罰與資訊分享維持海外代理人的誠信。[R126] Edwards 與 Ogilvie (2012) 反駁：這些商人也使用正式法院，並與非成員交易。[R127]
 - 菲律賓的微型貸款實驗：把聯保改成個人責任後，「短期與長期都沒有增加違約」。[R128]
 
@@ -444,8 +453,8 @@ Chesney 與 Citron (2019) 提出「說謊者紅利」(liar's dividend)：大眾�
 事實：古代法律已經有這個設計。
 - 漢摩拉比法典第 1 條：控告他人卻無法證明，控告者處死。第 3 條：在長老面前控告死罪卻無法證明，控告者處死。[R111]
 - 《申命記》19 章：一個證人不足以定罪；若證人作假見證，「就要以他想對待弟兄的方式對待他」。[R112]
-- 羅馬法對誣告 (calumnia) 有刑罰，控告者須宣誓沒有惡意；民事誣告訴訟中，敗訴原告須支付爭議金額的十分之一。[R113]
-- 現代的例子：美國《虛假申報法》(False Claims Act) 給檢舉人回收金額的 15–25%（政府介入時）或 25–30%（政府未介入時），保護檢舉人不被報復；但若訴訟「明顯無理、明顯為了騷擾」，被告可請求律師費。[R132]
+- 羅馬法對誣告（calumnia）有刑罰，控告者須宣誓沒有惡意；民事誣告訴訟中，敗訴原告須支付爭議金額的十分之一。[R113]
+- 現代的例子：美國《虛假申報法》（False Claims Act）給檢舉人回收金額的 15–25%（政府介入時）或 25–30%（政府未介入時），保護檢舉人不被報復；但若訴訟「明顯無理、明顯為了騷擾」，被告可請求律師費。[R132]
 
 副作用：
 - 檢舉人常是弱勢者。一項美國大型企業舞弊研究發現，具名的員工檢舉人中，82% 表示被解僱、被迫離職或職務被大幅改變。[R107]
@@ -472,7 +481,7 @@ Chesney 與 Citron (2019) 提出「說謊者紅利」(liar's dividend)：大眾�
 - 免疫學的雙訊號模型：只有訊號一（辨識抗原）會導致「麻痺」，也就是耐受；訊號一加上第二個相關訊號，才會引發反應。[R76] 實驗中，抗原呈現細胞的共同刺激功能被化學破壞後，看到抗原的 T 細胞會「至少 8 天無反應」。[R77]
 - Matzinger 的危險模型更進一步：免疫系統主要偵測的是「危險」，不是「非我」。[R78]
 - 阿富汗 2010 年的選舉實地實驗：事先告知選務人員計票單會被拍照，「選舉物資被竊減少約 60%」，與官員有關係的候選人得票減少約 25%。[R136]
-- 風險限制稽核 (risk-limiting audit) 用紙本選票抽樣檢查電子計票結果。[R137] Rivest 定義「不受軟體影響」(software independence)：軟體中未被發現的錯誤，不能造成選舉結果中無法被發現的錯誤。[R138]
+- 風險限制稽核（risk-limiting audit）用紙本選票抽樣檢查電子計票結果。[R137] Rivest 定義「不受軟體影響」（software independence）：軟體中未被發現的錯誤，不能造成選舉結果中無法被發現的錯誤。[R138]
 - 拜占庭問題中，有簽章的訊息讓系統能處理任意數量的叛徒。[R17]
 
 限制：
@@ -487,10 +496,10 @@ Chesney 與 Citron (2019) 提出「說謊者紅利」(liar's dividend)：大眾�
 證據類型：實務使用（數十到數百年）、歷史分析。本文沒有找到對照研究。
 
 事實：
-- 美國能源部規定：接觸核爆裝置的作業，必須至少兩名參與「人員保證計畫」(Personnel Assurance Program) 的授權人員在場。[R123]
+- 美國能源部規定：接觸核爆裝置的作業，必須至少兩名參與「人員保證計畫」（Personnel Assurance Program）的授權人員在場。[R123]
 - DNSSEC 根金鑰：啟用硬體安全模組需要 7 名加密主管中的 3 名；重建主金鑰需要 7 名金鑰分持人中的 5 名。[R73] 數學基礎是 Shamir 的秘密分享。[R75]
 - 威尼斯總督選舉（1268–1797）：抽籤與投票交替十輪，同一家族的成員不能同時在一個委員會中。分析指出它「對選民被收買有一定抵抗力」。[R121]
-- 雅典的陪審員以抽籤機 (kleroterion) 分配。[R122]
+- 雅典的陪審員以抽籤機（kleroterion）分配。[R122]
 - 愛爾蘭 2016–2018 年的公民會議由 99 名抽籤產生的公民組成，建議修改墮胎條款；2018 年公投以 66.4% 通過。[R146]
 
 推論：多人核可與抽籤都是讓「收買或滲透少數人」不足以造成傷害。它們是本節各機制中實務使用最久的一類。但「長期使用」不等於「證明有效」：本文沒有找到比較有無這些機制的對照研究，沒能延續的制度也較少被記錄。抽籤還有一個前提：候選池本身可信。若女巫帳號能進入候選池，抽籤也會被稀釋。（推論）
@@ -511,11 +520,11 @@ Chesney 與 Citron (2019) 提出「說謊者紅利」(liar's dividend)：大眾�
 
 ### 6.9 誘餌與蜜罐
 
-設計：情報界所說的「鋇餐」(barium meal) 或「金絲雀陷阱」：給不同的可信成員略有差異的敏感資訊或誘餌漏洞。若有內鬼利用或洩漏了某個版本，這個獨特的「浮水印」就會暴露他的身分，並可能牽出同夥網路。
+設計：情報界所說的「鋇餐」（barium meal）或「金絲雀陷阱」：給不同的可信成員略有差異的敏感資訊或誘餌漏洞。若有內鬼利用或洩漏了某個版本，這個獨特的「浮水印」就會暴露他的身分，並可能牽出同夥網路。
 
 證據類型：本文沒有找到。
 
-事實：本文沒有查證到公開、可引用的情報機關使用「金絲雀陷阱」(canary trap) 抓內鬼的一手紀錄。這不代表沒有使用，因為情報手法通常不公開。
+事實：本文沒有查證到公開、可引用的情報機關使用「金絲雀陷阱」（canary trap）抓內鬼的一手紀錄。這不代表沒有使用，因為情報手法通常不公開。
 
 反面證據：攻擊者也會用蜜罐。托拉斯行動本身就是一個巨大的蜜罐：假的反抗組織吸引真正的反抗者。[R114] Angleton 的抓內鬼行動顯示，過度追查的代價很高。[R118]
 
@@ -550,7 +559,7 @@ Chesney 與 Citron (2019) 提出「說謊者紅利」(liar's dividend)：大眾�
 - 開普蜂的寄生工蜂則突破了宿主的防線；宿主蜂群第二次遇到時，拒絕反應會變強。[R91]
 - 大豆的實驗中，強迫根瘤不固氮後，根瘤菌的繁殖成功率降低約 50%；減少供氧可能是機制之一。[R87] 榕樹的制裁越強，不授粉的「騙子」榕小蜂越少。[R88]
 - 被卷尾鳥騙太多次的動物會忽略重複的假警報；卷尾鳥則改用不同的警報聲來維持效果。[R101]
-- 在有雜訊的重複賽局中，「寬容的以牙還牙」(generous tit-for-tat) 比嚴格的以牙還牙表現更好。[R106]
+- 在有雜訊的重複賽局中，「寬容的以牙還牙」（generous tit-for-tat）比嚴格的以牙還牙表現更好。[R106]
 
 推論：生物系統很少追求零騙子。它們用「足夠的制裁」把騙子壓在可承受的比例，並容忍一定的錯誤。這也提醒設計者：攻防是持續的軍備競賽。[R94]（推論）
 
@@ -568,7 +577,7 @@ Chesney 與 Citron (2019) 提出「說謊者紅利」(liar's dividend)：大眾�
 - 但在實際的影響行動中，效果目前有限。OpenAI 2024 年 5 月的報告分析五個使用其模型的秘密影響行動，這些行動「似乎沒有因此明顯增加受眾參與或觸及」。[R194] Meta 2024 年第一季的報告也表示，「目前沒有看到會妨礙我們瓦解這些網路的新型生成式 AI 手法」。[R195] 這兩份都是企業的自我報告。
 - NIST 2024 年的報告指出：檔案中的中繼資料常在分享時被移除；自動偵測是偵測方與生成方「持續的貓捉老鼠」；偵測的誤判「可能造成極大傷害」；浮水印常可被移除；報告也以兒少性剝削影像為例警告：真實影像可能被謊稱為合成，影響被害人辨識。[R196]
 - 內容來源標準 C2PA 明確表示：來源資訊本身「無法告訴你數位內容是否真實、準確」；憑證可能被移除，所以規格另外設計了搭配浮水印或指紋的「耐久」憑證。[R197]
-- 「人格憑證」(personhood credentials) 的提案：讓使用者證明自己是真人，而不必透露個人資料；由政府或其他可信機構發行。[R198] 一篇回顧指出，這類「人格證明」技術「無法抽離主觀判斷」，仍需要有人決定誰可信。[R199]
+- 「人格憑證」（personhood credentials）的提案：讓使用者證明自己是真人，而不必透露個人資料；由政府或其他可信機構發行。[R198] 一篇回顧指出，這類「人格證明」技術「無法抽離主觀判斷」，仍需要有人決定誰可信。[R199]
 - 人格證明也有隱私代價。西班牙個資主管機關 2024 年 3 月以緊急程序暫停 Worldcoin 在西班牙蒐集與處理個資。[R200] 香港個人資料私隱專員公署 2024 年 5 月認定其違規，命令停止在香港掃描虹膜與臉部；當時已有 8,302 人被掃描。[R201]
 
 推論：
@@ -584,7 +593,7 @@ Chesney 與 Citron (2019) 提出「說謊者紅利」(liar's dividend)：大眾�
 6.10 節的設計預期：讓大眾看到內鬼被快速、公開地清除，反而會提高對系統的信任。這一節整理相關研究。
 
 事實：
-- 程序正義 (procedural justice) 的研究認為，人們是否服從法律，主要取決於他們是否覺得制度正當、程序公平，而不是害怕制裁。[R202] 程序公平的兩個要素是：決策的品質，以及對待當事人的方式。[R203]
+- 程序正義（procedural justice）的研究認為，人們是否服從法律，主要取決於他們是否覺得制度正當、程序公平，而不是害怕制裁。[R202] 程序公平的兩個要素是：決策的品質，以及對待當事人的方式。[R203]
 - 一項比較內容審查方式的研究（93 名美國臉書使用者）發現：專家小組被認為比演算法或抽籤陪審團更正當；但「是否同意處分結果」對正當性的影響，比程序本身更大。[R204]
 - 另一項研究測試不同的申訴設計，結果「沒有一種申訴設計」比沒有申訴更能提高使用者對公平、問責與可信的感受。[R205]
 - Reddit 的觀察研究：版主更常說明移除理由時，使用者之後被移除的貼文較少（說明率每增加一個標準差，勝算降低 6.5%）。這是相關，不是隨機實驗。[R206]
@@ -611,7 +620,7 @@ Chesney 與 Citron (2019) 提出「說謊者紅利」(liar's dividend)：大眾�
   - Camerfirma：Chrome 從 Chrome 90（2021 年 4 月）起停止接受；Mozilla 在 2021 年 2 月決定關閉其根憑證的網站信任位元，2021 年 4 月隨 Firefox 88 生效；Apple 的生效日是 2024 年 11 月 15 日，比 Chrome 晚約三年半。[R176][R177][R178]
   - Entrust：Google 2024 年 6 月宣布，Chrome 131 起不信任 2024 年 11 月 11 日之後簽發的憑證；Mozilla 約五週後（2024 年 7 月 31 日）宣布跟進，生效日為 2024 年 11 月 30 日；Apple 的生效日為 2024 年 11 月 15 日。[R179][R180][R178]
 - 去中心化社群也會集中。Mastodon 研究發現，約 10% 的站台承載了將近一半的使用者；只要 10 個站台中斷，就會讓全網 62.69% 的貼文無法取得。[R181]
-- 站台之間的「斷聯」(defederation) 是一種名單。一項準實驗研究分析 2021–2022 年的 214 次斷聯：被斷聯站台的帳號活動減少約 21%，但沒有發現對發文毒性的影響。[R182]
+- 站台之間的「斷聯」（defederation）是一種名單。一項準實驗研究分析 2021–2022 年的 214 次斷聯：被斷聯站台的帳號活動減少約 21%，但沒有發現對發文毒性的影響。[R182]
 - 共用封鎖名單會傳遞錯誤。一項訪談研究發現「封鎖傳染」：熱門封鎖名單被複製成多份後，原名單上被誤封的帳號，會被訂閱任何一份複製名單的人封鎖。[R183]
 - 垃圾郵件黑名單的研究發現，各名單「很少在誤判上彼此一致」；但也有 21% 的垃圾郵件沒有被任何一份名單擋下。[R184]
 
@@ -722,235 +731,235 @@ Chesney 與 Citron (2019) 提出「說謊者紅利」(liar's dividend)：大眾�
 ## 10. 參考資料
 
 ### 領域與綜述 (Fields and surveys)
-- [R1] Hoffman, K., Zage, D., Nita-Rotaru, C. (2009). A survey of attack and defense techniques for reputation systems. *ACM Computing Surveys*, 42(1), 1–31. https://doi.org/10.1145/1592451.1592452
-- [R2] Jøsang, A., Ismail, R., Boyd, C. (2007). A survey of trust and reputation systems for online service provision. *Decision Support Systems*, 43(2), 618–644. https://doi.org/10.1016/j.dss.2005.05.019
-- [R3] Resnick, P., Kuwabara, K., Zeckhauser, R., Friedman, E. (2000). Reputation systems. *Communications of the ACM*, 43(12), 45–48. https://doi.org/10.1145/355112.355122
-- [R4] IFIP WG 11.11 Trust Management. IFIPTM. https://www.ifiptm.org
-- [R5] Anderson, R. (2001). Why information security is hard – an economic perspective. *ACSAC 2001*, 358–365. https://doi.org/10.1109/ACSAC.2001.991552
-- [R6] Anderson, R., Moore, T. (2006). The economics of information security. *Science*, 314(5799), 610–613. https://doi.org/10.1126/science.1130992
-- [R7] WEIS 2004 call for papers（列出 2002 年起的歷屆研討會）. https://www-old.cs.utah.edu/flux/cipher/cfps/cfp-WEIS04.html
-- [R8] AIRWeb: Adversarial Information Retrieval on the Web (2005–2009). https://airweb.cse.lehigh.edu/
-- [R9] Trust & Safety Professional Association. New organizations dedicated to online trust and safety. 2020-06-17. https://www.tspa.org/2020/06/17/new-organizations-dedicated-to-online-trust-and-safety/
-- [R10] Journal of Online Trust and Safety. About. https://www.tsjournal.org/index.php/jots/about
-- [R11] Carnegie Mellon University SEI. New edition of Common Sense Guide to Mitigating Insider Threats released. 2022-09-08. https://sei.cmu.edu/news/new-edition-of-common-sense-guide-to-mitigating-insider-threats-released
-- [R12] Forrest, S., Perelson, A. S., Allen, L., Cherukuri, R. (1994). Self-nonself discrimination in a computer. *Proc. 1994 IEEE Symposium on Research in Security and Privacy*, 202–212. https://doi.org/10.1109/RISP.1994.296580
-- [R13] Forrest, S., Hofmeyr, S. A., Somayaji, A. (1997). Computer immunology. *Communications of the ACM*, 40(10), 88–96. https://doi.org/10.1145/262793.262811
-- [R14] Gambetta, D. (Ed.) (1988). *Trust: Making and Breaking Cooperative Relations*. Basil Blackwell. https://www.nuffield.ox.ac.uk/people/sites/gambetta-research/
-- [R15] Nowak, M. A. (2006). Five rules for the evolution of cooperation. *Science*, 314(5805), 1560–1563. https://doi.org/10.1126/science.1133755
+- [R1] Hoffman, K., Zage, D., Nita-Rotaru, C. (2009). A survey of attack and defense techniques for reputation systems. *ACM Computing Surveys*, 42(1), 1–31. <https://doi.org/10.1145/1592451.1592452>
+- [R2] Jøsang, A., Ismail, R., Boyd, C. (2007). A survey of trust and reputation systems for online service provision. *Decision Support Systems*, 43(2), 618–644. <https://doi.org/10.1016/j.dss.2005.05.019>
+- [R3] Resnick, P., Kuwabara, K., Zeckhauser, R., Friedman, E. (2000). Reputation systems. *Communications of the ACM*, 43(12), 45–48. <https://doi.org/10.1145/355112.355122>
+- [R4] IFIP WG 11.11 Trust Management. IFIPTM. <https://www.ifiptm.org>
+- [R5] Anderson, R. (2001). Why information security is hard – an economic perspective. *ACSAC 2001*, 358–365. <https://doi.org/10.1109/ACSAC.2001.991552>
+- [R6] Anderson, R., Moore, T. (2006). The economics of information security. *Science*, 314(5799), 610–613. <https://doi.org/10.1126/science.1130992>
+- [R7] WEIS 2004 call for papers（列出 2002 年起的歷屆研討會）. <https://www-old.cs.utah.edu/flux/cipher/cfps/cfp-WEIS04.html>
+- [R8] AIRWeb: Adversarial Information Retrieval on the Web (2005–2009). <https://airweb.cse.lehigh.edu/>
+- [R9] Trust & Safety Professional Association. New organizations dedicated to online trust and safety. 2020-06-17. <https://www.tspa.org/2020/06/17/new-organizations-dedicated-to-online-trust-and-safety/>
+- [R10] Journal of Online Trust and Safety. About. <https://www.tsjournal.org/index.php/jots/about>
+- [R11] Carnegie Mellon University SEI. New edition of Common Sense Guide to Mitigating Insider Threats released. 2022-09-08. <https://sei.cmu.edu/news/new-edition-of-common-sense-guide-to-mitigating-insider-threats-released>
+- [R12] Forrest, S., Perelson, A. S., Allen, L., Cherukuri, R. (1994). Self-nonself discrimination in a computer. *Proc. 1994 IEEE Symposium on Research in Security and Privacy*, 202–212. <https://doi.org/10.1109/RISP.1994.296580>
+- [R13] Forrest, S., Hofmeyr, S. A., Somayaji, A. (1997). Computer immunology. *Communications of the ACM*, 40(10), 88–96. <https://doi.org/10.1145/262793.262811>
+- [R14] Gambetta, D. (Ed.) (1988). *Trust: Making and Breaking Cooperative Relations*. Basil Blackwell. <https://www.nuffield.ox.ac.uk/people/sites/gambetta-research/>
+- [R15] Nowak, M. A. (2006). Five rules for the evolution of cooperation. *Science*, 314(5805), 1560–1563. <https://doi.org/10.1126/science.1133755>
 
 ### 理論與不可能結果 (Theory and impossibility results)
-- [R16] Douceur, J. R. (2002). The Sybil attack. *IPTPS 2002*, LNCS 2429, 251–260. https://doi.org/10.1007/3-540-45748-8_24
-- [R17] Lamport, L., Shostak, R., Pease, M. (1982). The Byzantine generals problem. *ACM TOPLAS*, 4(3), 382–401. https://doi.org/10.1145/357172.357176
-- [R18] Cheng, A., Friedman, E. (2005). Sybilproof reputation mechanisms. *P2PECON '05*, 128–132. https://doi.org/10.1145/1080192.1080202
-- [R19] Levien, R., Aiken, A. (1998). Attack-resistant trust metrics for public key certification. *7th USENIX Security Symposium*. https://www.usenix.org/publications/library/proceedings/sec98/full_papers/levien/levien_html/levien.html
-- [R20] Axelsson, S. (2000). The base-rate fallacy and the difficulty of intrusion detection. *ACM TISSEC*, 3(3), 186–205. https://doi.org/10.1145/357830.357849
-- [R21] National Research Council (2003). *The Polygraph and Lie Detection*. National Academies Press. https://doi.org/10.17226/10420 ；新聞稿 2002-10-08：<https://www.nationalacademies.org/news/2002/10/the-polygraph-and-lie-detection>
-- [R22] Reeve, H. K. (1989). The evolution of conspecific acceptance thresholds. *The American Naturalist*, 133(3), 407–435. https://doi.org/10.1086/284926
-- [R23] Goodhart, C. A. E. (1975). Problems of monetary management: the U.K. experience. *Papers in Monetary Economics*, Vol. I. Reserve Bank of Australia. 重印於 Goodhart, C. A. E. (1984). *Monetary Theory and Practice*. Macmillan. https://link.springer.com/book/10.1007/978-1-349-17295-5
-- [R24] Campbell, D. T. (1979). Assessing the impact of planned social change. *Evaluation and Program Planning*, 2(1), 67–90. https://doi.org/10.1016/0149-7189(79)90048-X
-- [R25] Ohtsuki, H., Iwasa, Y. (2004). How should we define goodness? Reputation dynamics in indirect reciprocity. *Journal of Theoretical Biology*, 231(1), 107–120. https://doi.org/10.1016/j.jtbi.2004.06.005
-- [R26] Nowak, M. A., Sigmund, K. (2005). Evolution of indirect reciprocity. *Nature*, 437(7063), 1291–1298. https://doi.org/10.1038/nature04131
-- [R27] Slovic, P. (1993). Perceived risk, trust, and democracy. *Risk Analysis*, 13(6), 675–682. https://doi.org/10.1111/j.1539-6924.1993.tb01329.x ；反面證據：White, M. P., Eiser, J. R. (2005). Information specificity and hazard risk potential as moderators of trust asymmetry. *Risk Analysis*, 25(5), 1187–1198. <https://doi.org/10.1111/j.1539-6924.2005.00659.x>
-- [R28] Chesney, R., Citron, D. (2019). Deep fakes: a looming challenge for privacy, democracy, and national security. *California Law Review*, 107(6), 1753–1820. https://www.californialawreview.org/print/deep-fakes-a-looming-challenge-for-privacy-democracy-and-national-security
+- [R16] Douceur, J. R. (2002). The Sybil attack. *IPTPS 2002*, LNCS 2429, 251–260. <https://doi.org/10.1007/3-540-45748-8_24>
+- [R17] Lamport, L., Shostak, R., Pease, M. (1982). The Byzantine generals problem. *ACM TOPLAS*, 4(3), 382–401. <https://doi.org/10.1145/357172.357176>
+- [R18] Cheng, A., Friedman, E. (2005). Sybilproof reputation mechanisms. *P2PECON '05*, 128–132. <https://doi.org/10.1145/1080192.1080202>
+- [R19] Levien, R., Aiken, A. (1998). Attack-resistant trust metrics for public key certification. *7th USENIX Security Symposium*. <https://www.usenix.org/publications/library/proceedings/sec98/full_papers/levien/levien_html/levien.html>
+- [R20] Axelsson, S. (2000). The base-rate fallacy and the difficulty of intrusion detection. *ACM TISSEC*, 3(3), 186–205. <https://doi.org/10.1145/357830.357849>
+- [R21] National Research Council (2003). *The Polygraph and Lie Detection*. National Academies Press. <https://doi.org/10.17226/10420> ；新聞稿 2002-10-08：<https://www.nationalacademies.org/news/2002/10/the-polygraph-and-lie-detection>
+- [R22] Reeve, H. K. (1989). The evolution of conspecific acceptance thresholds. *The American Naturalist*, 133(3), 407–435. <https://doi.org/10.1086/284926>
+- [R23] Goodhart, C. A. E. (1975). Problems of monetary management: the U.K. experience. *Papers in Monetary Economics*, Vol. I. Reserve Bank of Australia. 重印於 Goodhart, C. A. E. (1984). *Monetary Theory and Practice*. Macmillan. <https://link.springer.com/book/10.1007/978-1-349-17295-5>
+- [R24] Campbell, D. T. (1979). Assessing the impact of planned social change. *Evaluation and Program Planning*, 2(1), 67–90. <https://doi.org/10.1016/0149-7189(79)90048-X>
+- [R25] Ohtsuki, H., Iwasa, Y. (2004). How should we define goodness? Reputation dynamics in indirect reciprocity. *Journal of Theoretical Biology*, 231(1), 107–120. <https://doi.org/10.1016/j.jtbi.2004.06.005>
+- [R26] Nowak, M. A., Sigmund, K. (2005). Evolution of indirect reciprocity. *Nature*, 437(7063), 1291–1298. <https://doi.org/10.1038/nature04131>
+- [R27] Slovic, P. (1993). Perceived risk, trust, and democracy. *Risk Analysis*, 13(6), 675–682. <https://doi.org/10.1111/j.1539-6924.1993.tb01329.x> ；反面證據：White, M. P., Eiser, J. R. (2005). Information specificity and hazard risk potential as moderators of trust asymmetry. *Risk Analysis*, 25(5), 1187–1198. <https://doi.org/10.1111/j.1539-6924.2005.00659.x>
+- [R28] Chesney, R., Citron, D. (2019). Deep fakes: a looming challenge for privacy, democracy, and national security. *California Law Review*, 107(6), 1753–1820. <https://www.californialawreview.org/print/deep-fakes-a-looming-challenge-for-privacy-democracy-and-national-security>
 
 ### 電腦科學、開源與平台 (Computing, open source, platforms)
-- [R29] Kamvar, S. D., Schlosser, M. T., Garcia-Molina, H. (2003). The EigenTrust algorithm for reputation management in P2P networks. *WWW '03*, 640–651. https://doi.org/10.1145/775152.775242
-- [R30] Gyöngyi, Z., Garcia-Molina, H., Pedersen, J. (2004). Combating web spam with TrustRank. *VLDB 2004*, 576–587. https://vldb.org/conf/2004/RS15P3.PDF
-- [R31] Yu, H., Kaminsky, M., Gibbons, P. B., Flaxman, A. (2006). SybilGuard: defending against Sybil attacks via social networks. *SIGCOMM 2006*, CCR 36(4), 267–278. https://doi.org/10.1145/1151659.1159945
-- [R32] Cao, Q., Sirivianos, M., Yang, X., Pregueiro, T. (2012). Aiding the detection of fake accounts in large scale social online services. *NSDI '12*, 197–210. https://www.usenix.org/conference/nsdi12/technical-sessions/presentation/cao
-- [R33] Yang, Z., Wilson, C., Wang, X., Gao, T., Zhao, B. Y., Dai, Y. (2011). Uncovering social network Sybils in the wild. *IMC '11*, 259–268. https://doi.org/10.1145/2068816.2068841
-- [R34] Viswanath, B., Post, A., Gummadi, K. P., Mislove, A. (2010). An analysis of social network-based Sybil defenses. *SIGCOMM 2010*, 363–374. https://doi.org/10.1145/1851182.1851226
-- [R35] Cox, R. Timeline of the xz open source attack. https://research.swtch.com/xz-timeline
-- [R36] Freund, A. backdoor in upstream xz/liblzma leading to ssh server compromise. oss-security, 2024-03-29. https://www.openwall.com/lists/oss-security/2024/03/29/4
-- [R37] Collin, L. XZ Utils backdoor. https://tukaani.org/xz-backdoor/
-- [R38] CISA. Reported supply chain compromise affecting XZ Utils data compression library, CVE-2024-3094. 2024-03-29. https://www.cisa.gov/news-events/alerts/2024/03/29/reported-supply-chain-compromise-affecting-xz-utils-data-compression-library-cve-2024-3094
-- [R39] "Jigar Kumar". xz-devel mailing list, 2022-06-07. https://www.mail-archive.com/xz-devel@tukaani.org/msg00566.html
-- [R40] Collin, L. xz-devel mailing list, 2022-06-08. https://www.mail-archive.com/xz-devel@tukaani.org/msg00567.html
-- [R41] University of Minnesota, Department of Computer Science & Engineering. Statement on Linux kernel research. 2021. https://cse.umn.edu/node/100826
-- [R42] Linux Foundation Technical Advisory Board. Report on University of Minnesota breach-of-trust incident. 2021-05-05. https://lkml.iu.edu/hypermail/linux/kernel/2105.0/04009.html
-- [R43] npm. Details about the event-stream incident. 2018-11-27. https://blog.npmjs.org/post/180565383195/details-about-the-event-stream-incident ；原作者說明：<https://github.com/dominictarr/event-stream/issues/116>
-- [R44] Fox-IT. Black Tulip: report of the investigation into the DigiNotar certificate authority breach. 2012-08-13. https://zoek.officielebekendmakingen.nl/blg-191225.pdf
-- [R45] Google Security Blog. An update on attempted man-in-the-middle attacks. 2011-08-29 (updated 2011-09-03). https://security.googleblog.com/2011/08/update-on-attempted-man-in-middle.html
-- [R46] Laurie, B., Langley, A., Kasper, E. (2013). RFC 6962: Certificate Transparency. https://www.rfc-editor.org/rfc/rfc6962
-- [R47] Google Security Blog. Improved digital certificate security. 2015-09. https://security.googleblog.com/2015/09/improved-digital-certificate-security.html
-- [R48] Google Security Blog. Sustaining digital certificate security. 2015-10-28. https://security.googleblog.com/2015/10/sustaining-digital-certificate-security.html
-- [R49] Google Security Blog. Chrome's plan to distrust Symantec certificates. 2017-09-11. https://security.googleblog.com/2017/09/chromes-plan-to-distrust-symantec.html
-- [R50] Google Security Blog. Distrusting WoSign and StartCom certificates. 2016-10. https://security.googleblog.com/2016/10/distrusting-wosign-and-startcom.html
-- [R51] Google Security Blog. Sustaining digital certificate security – TrustCor certificate distrust. 2023-01-13. https://security.googleblog.com/2023/01/sustaining-digital-certificate-security_13.html ；Mozilla 的決定：The Register, 2022-12-02, <https://www.theregister.com/2022/12/02/mozilla_microsoft_trustcor/>
-- [R52] Hansen, R. J. SKS keyserver network under attack. 2019-06. https://gist.github.com/rjhansen/67ab921ffb4084c865b3618d6955275f
-- [R53] Cimpanu, C. A mysterious threat actor is running hundreds of malicious Tor relays. The Record, 2021-12-03. https://therecord.media/a-mysterious-threat-actor-is-running-hundreds-of-malicious-tor-relays
-- [R54] Tor Project. auth_dirs.inc (directory authorities), source view. https://tpo.pages.torproject.net/core/doc/tor/auth__dirs_8inc_source.html
-- [R55] ethereum.org. Proof-of-stake rewards and penalties. https://ethereum.org/en/developers/docs/consensus-mechanisms/pos/rewards-and-penalties/
-- [R56] Buterin, V. A griefing factor analysis model. ethresear.ch, 2018-06-24. https://ethresear.ch/t/a-griefing-factor-analysis-model/2338
-- [R57] Bitquery. Attacker stole 807K ETC in Ethereum Classic 51% attack. 2020-08. https://bitquery.io/blog/attacker-stole-807k-etc-in-ethereum-classic-51-attack
-- [R58] Gitcoin governance forum. Nerd post: updates to cluster mapping matching. 2024-04-30. https://gov.gitcoin.co/t/nerd-post-updates-to-cluster-mapping-matching/18705
-- [R59] Lobsters. About. https://lobste.rs/about
-- [R60] X Community Notes. Documentation: challenges and the bridging algorithm. https://github.com/twitter/communitynotes/blob/main/documentation/about/challenges.md
-- [R61] Bolton, G., Greiner, B., Ockenfels, A. (2013). Engineering trust: reciprocity in the production of reputation information. *Management Science*, 59(2), 265–285. https://doi.org/10.1287/mnsc.1120.1609
-- [R62] He, S., Hollenbeck, B., Proserpio, D. (2022). The market for fake reviews. *Marketing Science*, 41(5), 896–921. https://doi.org/10.1287/mksc.2022.1353
-- [R63] Luca, M., Zervas, G. (2016). Fake it till you make it: reputation, competition, and Yelp review fraud. *Management Science*, 62(12), 3412–3427. https://doi.org/10.1287/mnsc.2015.2304
-- [R64] U.S. Federal Trade Commission. Federal Trade Commission announces final rule banning fake reviews and testimonials. 2024-08-14. https://www.ftc.gov/news-events/news/press-releases/2024/08/federal-trade-commission-announces-final-rule-banning-fake-reviews-testimonials
-- [R65] Retraction Watch. SAGE Publications busts "peer review and citation ring," 60 papers retracted. 2014-07-08. https://retractionwatch.com/2014/07/08/sage-publications-busts-peer-review-and-citation-ring-60-papers-retracted
-- [R66] Ferguson, C., Marcus, A., Oransky, I. (2014). Publishing: the peer-review scam. *Nature*, 515(7528), 480–482. https://doi.org/10.1038/515480a
-- [R67] Van Noorden, R. (2023). More than 10,000 research papers were retracted in 2023 — a new record. *Nature*, 624(7992), 479–481. https://doi.org/10.1038/d41586-023-03974-8
-- [R68] Van Noorden, R. (2013). Brazilian citation scheme outed. *Nature*, 500(7464), 510–511. https://doi.org/10.1038/500510a
-- [R69] Urban, J. M., Karaganis, J., Schofield, B. L. (2016, rev. 2017). Notice and takedown in everyday practice. UC Berkeley Public Law Research Paper. https://papers.ssrn.com/abstract=2755628
-- [R70] Grossman, S., et al. (2020). Reporting for duty: how a network of Pakistan-based accounts leveraged mass reporting to silence critics. Stanford Internet Observatory. https://purl.stanford.edu/cs867xt4586
-- [R71] Meta. More speech and fewer mistakes. 2025-01-07 (updated 2025-05-29). https://about.fb.com/news/2025/01/meta-more-speech-fewer-mistakes/
-- [R72] Haimson, O. L., Delmonaco, D., Nie, P., Wegner, A. (2021). Disproportionate removals and differing content moderation experiences for conservative, transgender, and Black social media users: marginalization and moderation gray areas. *PACM HCI*, 5(CSCW2), Article 466, 1–35. https://doi.org/10.1145/3479610
-- [R73] Root Zone KSK Operator. DNSSEC Practice Statement. https://www.iana.org/dnssec/procedures/ksk-operator/ksk-dps-20261007.html ；TCR 名單：<https://www.iana.org/dnssec/tcrs>
-- [R74] YouTube Official Blog. Growing our Trusted Flagger program. 2016-09. https://blog.youtube/news-and-events/growing-our-trusted-flagger-program/
-- [R75] Shamir, A. (1979). How to share a secret. *Communications of the ACM*, 22(11), 612–613. https://doi.org/10.1145/359168.359176
+- [R29] Kamvar, S. D., Schlosser, M. T., Garcia-Molina, H. (2003). The EigenTrust algorithm for reputation management in P2P networks. *WWW '03*, 640–651. <https://doi.org/10.1145/775152.775242>
+- [R30] Gyöngyi, Z., Garcia-Molina, H., Pedersen, J. (2004). Combating web spam with TrustRank. *VLDB 2004*, 576–587. <https://vldb.org/conf/2004/RS15P3.PDF>
+- [R31] Yu, H., Kaminsky, M., Gibbons, P. B., Flaxman, A. (2006). SybilGuard: defending against Sybil attacks via social networks. *SIGCOMM 2006*, CCR 36(4), 267–278. <https://doi.org/10.1145/1151659.1159945>
+- [R32] Cao, Q., Sirivianos, M., Yang, X., Pregueiro, T. (2012). Aiding the detection of fake accounts in large scale social online services. *NSDI '12*, 197–210. <https://www.usenix.org/conference/nsdi12/technical-sessions/presentation/cao>
+- [R33] Yang, Z., Wilson, C., Wang, X., Gao, T., Zhao, B. Y., Dai, Y. (2011). Uncovering social network Sybils in the wild. *IMC '11*, 259–268. <https://doi.org/10.1145/2068816.2068841>
+- [R34] Viswanath, B., Post, A., Gummadi, K. P., Mislove, A. (2010). An analysis of social network-based Sybil defenses. *SIGCOMM 2010*, 363–374. <https://doi.org/10.1145/1851182.1851226>
+- [R35] Cox, R. Timeline of the xz open source attack. <https://research.swtch.com/xz-timeline>
+- [R36] Freund, A. backdoor in upstream xz/liblzma leading to ssh server compromise. oss-security, 2024-03-29. <https://www.openwall.com/lists/oss-security/2024/03/29/4>
+- [R37] Collin, L. XZ Utils backdoor. <https://tukaani.org/xz-backdoor/>
+- [R38] CISA. Reported supply chain compromise affecting XZ Utils data compression library, CVE-2024-3094. 2024-03-29. <https://www.cisa.gov/news-events/alerts/2024/03/29/reported-supply-chain-compromise-affecting-xz-utils-data-compression-library-cve-2024-3094>
+- [R39] "Jigar Kumar". xz-devel mailing list, 2022-06-07. <https://www.mail-archive.com/xz-devel@tukaani.org/msg00566.html>
+- [R40] Collin, L. xz-devel mailing list, 2022-06-08. <https://www.mail-archive.com/xz-devel@tukaani.org/msg00567.html>
+- [R41] University of Minnesota, Department of Computer Science & Engineering. Statement on Linux kernel research. 2021. <https://cse.umn.edu/node/100826>
+- [R42] Linux Foundation Technical Advisory Board. Report on University of Minnesota breach-of-trust incident. 2021-05-05. <https://lkml.iu.edu/hypermail/linux/kernel/2105.0/04009.html>
+- [R43] npm. Details about the event-stream incident. 2018-11-27. <https://blog.npmjs.org/post/180565383195/details-about-the-event-stream-incident> ；原作者說明：<https://github.com/dominictarr/event-stream/issues/116>
+- [R44] Fox-IT. Black Tulip: report of the investigation into the DigiNotar certificate authority breach. 2012-08-13. <https://zoek.officielebekendmakingen.nl/blg-191225.pdf>
+- [R45] Google Security Blog. An update on attempted man-in-the-middle attacks. 2011-08-29 (updated 2011-09-03). <https://security.googleblog.com/2011/08/update-on-attempted-man-in-middle.html>
+- [R46] Laurie, B., Langley, A., Kasper, E. (2013). RFC 6962: Certificate Transparency. <https://www.rfc-editor.org/rfc/rfc6962>
+- [R47] Google Security Blog. Improved digital certificate security. 2015-09. <https://security.googleblog.com/2015/09/improved-digital-certificate-security.html>
+- [R48] Google Security Blog. Sustaining digital certificate security. 2015-10-28. <https://security.googleblog.com/2015/10/sustaining-digital-certificate-security.html>
+- [R49] Google Security Blog. Chrome's plan to distrust Symantec certificates. 2017-09-11. <https://security.googleblog.com/2017/09/chromes-plan-to-distrust-symantec.html>
+- [R50] Google Security Blog. Distrusting WoSign and StartCom certificates. 2016-10. <https://security.googleblog.com/2016/10/distrusting-wosign-and-startcom.html>
+- [R51] Google Security Blog. Sustaining digital certificate security – TrustCor certificate distrust. 2023-01-13. <https://security.googleblog.com/2023/01/sustaining-digital-certificate-security_13.html> ；Mozilla 的決定：The Register, 2022-12-02, <https://www.theregister.com/2022/12/02/mozilla_microsoft_trustcor/>
+- [R52] Hansen, R. J. SKS keyserver network under attack. 2019-06. <https://gist.github.com/rjhansen/67ab921ffb4084c865b3618d6955275f>
+- [R53] Cimpanu, C. A mysterious threat actor is running hundreds of malicious Tor relays. The Record, 2021-12-03. <https://therecord.media/a-mysterious-threat-actor-is-running-hundreds-of-malicious-tor-relays>
+- [R54] Tor Project. auth_dirs.inc (directory authorities), source view. <https://tpo.pages.torproject.net/core/doc/tor/auth__dirs_8inc_source.html>
+- [R55] ethereum.org. Proof-of-stake rewards and penalties. <https://ethereum.org/en/developers/docs/consensus-mechanisms/pos/rewards-and-penalties/>
+- [R56] Buterin, V. A griefing factor analysis model. ethresear.ch, 2018-06-24. <https://ethresear.ch/t/a-griefing-factor-analysis-model/2338>
+- [R57] Bitquery. Attacker stole 807K ETC in Ethereum Classic 51% attack. 2020-08. <https://bitquery.io/blog/attacker-stole-807k-etc-in-ethereum-classic-51-attack>
+- [R58] Gitcoin governance forum. Nerd post: updates to cluster mapping matching. 2024-04-30. <https://gov.gitcoin.co/t/nerd-post-updates-to-cluster-mapping-matching/18705>
+- [R59] Lobsters. About. <https://lobste.rs/about>
+- [R60] X Community Notes. Documentation: challenges and the bridging algorithm. <https://github.com/twitter/communitynotes/blob/main/documentation/about/challenges.md>
+- [R61] Bolton, G., Greiner, B., Ockenfels, A. (2013). Engineering trust: reciprocity in the production of reputation information. *Management Science*, 59(2), 265–285. <https://doi.org/10.1287/mnsc.1120.1609>
+- [R62] He, S., Hollenbeck, B., Proserpio, D. (2022). The market for fake reviews. *Marketing Science*, 41(5), 896–921. <https://doi.org/10.1287/mksc.2022.1353>
+- [R63] Luca, M., Zervas, G. (2016). Fake it till you make it: reputation, competition, and Yelp review fraud. *Management Science*, 62(12), 3412–3427. <https://doi.org/10.1287/mnsc.2015.2304>
+- [R64] U.S. Federal Trade Commission. Federal Trade Commission announces final rule banning fake reviews and testimonials. 2024-08-14. <https://www.ftc.gov/news-events/news/press-releases/2024/08/federal-trade-commission-announces-final-rule-banning-fake-reviews-testimonials>
+- [R65] Retraction Watch. SAGE Publications busts "peer review and citation ring," 60 papers retracted. 2014-07-08. <https://retractionwatch.com/2014/07/08/sage-publications-busts-peer-review-and-citation-ring-60-papers-retracted>
+- [R66] Ferguson, C., Marcus, A., Oransky, I. (2014). Publishing: the peer-review scam. *Nature*, 515(7528), 480–482. <https://doi.org/10.1038/515480a>
+- [R67] Van Noorden, R. (2023). More than 10,000 research papers were retracted in 2023 — a new record. *Nature*, 624(7992), 479–481. <https://doi.org/10.1038/d41586-023-03974-8>
+- [R68] Van Noorden, R. (2013). Brazilian citation scheme outed. *Nature*, 500(7464), 510–511. <https://doi.org/10.1038/500510a>
+- [R69] Urban, J. M., Karaganis, J., Schofield, B. L. (2016, rev. 2017). Notice and takedown in everyday practice. UC Berkeley Public Law Research Paper. <https://papers.ssrn.com/abstract=2755628>
+- [R70] Grossman, S., et al. (2020). Reporting for duty: how a network of Pakistan-based accounts leveraged mass reporting to silence critics. Stanford Internet Observatory. <https://purl.stanford.edu/cs867xt4586>
+- [R71] Meta. More speech and fewer mistakes. 2025-01-07 (updated 2025-05-29). <https://about.fb.com/news/2025/01/meta-more-speech-fewer-mistakes/>
+- [R72] Haimson, O. L., Delmonaco, D., Nie, P., Wegner, A. (2021). Disproportionate removals and differing content moderation experiences for conservative, transgender, and Black social media users: marginalization and moderation gray areas. *PACM HCI*, 5(CSCW2), Article 466, 1–35. <https://doi.org/10.1145/3479610>
+- [R73] Root Zone KSK Operator. DNSSEC Practice Statement. <https://www.iana.org/dnssec/procedures/ksk-operator/ksk-dps-20261007.html> ；TCR 名單：<https://www.iana.org/dnssec/tcrs>
+- [R74] YouTube Official Blog. Growing our Trusted Flagger program. 2016-09. <https://blog.youtube/news-and-events/growing-our-trusted-flagger-program/>
+- [R75] Shamir, A. (1979). How to share a secret. *Communications of the ACM*, 22(11), 612–613. <https://doi.org/10.1145/359168.359176>
 
 ### 免疫學與生物學 (Immunology and biology)
-- [R76] Bretscher, P., Cohn, M. (1970). A theory of self-nonself discrimination. *Science*, 169(3950), 1042–1049. https://doi.org/10.1126/science.169.3950.1042
-- [R77] Jenkins, M. K., Schwartz, R. H. (1987). Antigen presentation by chemically modified splenocytes induces antigen-specific T cell unresponsiveness in vitro and in vivo. *Journal of Experimental Medicine*, 165(2), 302–319. https://doi.org/10.1084/jem.165.2.302
-- [R78] Matzinger, P. (1994). Tolerance, danger, and the extended family. *Annual Review of Immunology*, 12, 991–1045. https://doi.org/10.1146/annurev.iy.12.040194.005015
-- [R79] Sakaguchi, S., Sakaguchi, N., Asano, M., Itoh, M., Toda, M. (1995). Immunologic self-tolerance maintained by activated T cells expressing IL-2 receptor α-chains (CD25): breakdown of a single mechanism of self-tolerance causes various autoimmune diseases. *Journal of Immunology*, 155(3), 1151–1164. https://doi.org/10.4049/jimmunol.155.3.1151
-- [R80] Nobel Prize Outreach. The Nobel Prize in Physiology or Medicine 2025: press release. 2025-10-06. https://www.nobelprize.org/prizes/medicine/2025/press-release/
-- [R81] Cunningham, M. W. (2014). Rheumatic fever, autoimmunity, and molecular mimicry: the streptococcal connection. *International Reviews of Immunology*, 33(4), 314–329. https://doi.org/10.3109/08830185.2014.917411
-- [R82] Yuki, N., Susuki, K., Koga, M., et al. (2004). Carbohydrate mimicry between human ganglioside GM1 and *Campylobacter jejuni* lipooligosaccharide causes Guillain–Barré syndrome. *PNAS*, 101(31), 11404–11409. https://doi.org/10.1073/pnas.0402391101
-- [R83] Kärre, K., Ljunggren, H. G., Piontek, G., Kiessling, R. (1986). Selective rejection of H-2-deficient lymphoma variants suggests alternative immune defence strategy. *Nature*, 319(6055), 675–678. https://doi.org/10.1038/319675a0
-- [R84] Hansen, T. H., Bouvier, M. (2009). MHC class I antigen presentation: learning from viral evasion strategies. *Nature Reviews Immunology*, 9(7), 503–513. https://doi.org/10.1038/nri2575
-- [R85] Doitsh, G., Galloway, N. L., Geng, X., et al. (2014). Cell death by pyroptosis drives CD4 T-cell depletion in HIV-1 infection. *Nature*, 505(7484), 509–514. https://doi.org/10.1038/nature12940
-- [R86] Bshary, R., Grutter, A. S. (2006). Image scoring and cooperation in a cleaner fish mutualism. *Nature*, 441(7096), 975–978. https://doi.org/10.1038/nature04755
-- [R87] Kiers, E. T., Rousseau, R. A., West, S. A., Denison, R. F. (2003). Host sanctions and the legume–rhizobium mutualism. *Nature*, 425(6953), 78–81. https://doi.org/10.1038/nature01931
-- [R88] Jandér, K. C., Herre, E. A. (2010). Host sanctions and pollinator cheating in the fig tree–fig wasp mutualism. *Proceedings of the Royal Society B*, 277(1687), 1481–1488. https://doi.org/10.1098/rspb.2009.2157
-- [R89] Visscher, P. K. (1996). Reproductive conflict in honey bees: a stalemate of worker egg-laying and policing. *Behavioral Ecology and Sociobiology*, 39(4), 237–244. https://doi.org/10.1007/s002650050286 ；全文：<https://bees.ucr.edu/media/161/download>
-- [R90] Wenseleers, T., Ratnieks, F. L. W. (2006). Enforced altruism in insect societies. *Nature*, 444(7115), 50. https://doi.org/10.1038/444050a
-- [R91] Neumann, P., Pirk, C. W. W. (2019). Increased response to sequential infections of honeybee, *Apis mellifera scutellata*, colonies by socially parasitic Cape honeybee, *A. m. capensis*, workers. *Scientific Reports*, 9, 7582. https://doi.org/10.1038/s41598-019-43920-1
-- [R92] Barbero, F., Thomas, J. A., Bonelli, S., Balletto, E., Schönrogge, K. (2009). Queen ants make distinctive sounds that are mimicked by a butterfly social parasite. *Science*, 323(5915), 782–785. https://doi.org/10.1126/science.1163583
-- [R93] Akino, T., Knapp, J. J., Thomas, J. A., Elmes, G. W. (1999). Chemical mimicry and host specificity in the butterfly *Maculinea rebeli*, a social parasite of *Myrmica* ant colonies. *Proceedings of the Royal Society B*, 266(1427), 1419–1426. https://doi.org/10.1098/rspb.1999.0796
-- [R94] Nash, D. R., Als, T. D., Maile, R., Jones, G. R., Boomsma, J. J. (2008). A mosaic of chemical coevolution in a large blue butterfly. *Science*, 319(5859), 88–90. https://doi.org/10.1126/science.1149180
-- [R95] Lotem, A., Nakamura, H., Zahavi, A. (1995). Constraints on egg discrimination and cuckoo–host co-evolution. *Animal Behaviour*, 49(5), 1185–1209. https://doi.org/10.1006/anbe.1995.0152
-- [R96] Soler, M., Soler, J. J., Martinez, J. G., Møller, A. P. (1995). Magpie host manipulation by great spotted cuckoos: evidence for an avian mafia? *Evolution*, 49(4), 770–775. https://doi.org/10.1111/j.1558-5646.1995.tb02312.x
-- [R97] Strassmann, J. E., Zhu, Y., Queller, D. C. (2000). Altruism and social cheating in the social amoeba *Dictyostelium discoideum*. *Nature*, 408(6815), 965–967. https://doi.org/10.1038/35050087
-- [R98] Gardner, A., West, S. A. (2010). Greenbeards. *Evolution*, 64(1), 25–38. https://doi.org/10.1111/j.1558-5646.2009.00842.x
-- [R99] Grafen, A. (1990). Biological signals as handicaps. *Journal of Theoretical Biology*, 144(4), 517–546. https://doi.org/10.1016/S0022-5193(05)80088-8 ；Zahavi, A. (1975). Mate selection—a selection for a handicap. *J Theor Biol*, 53(1), 205–214. <https://doi.org/10.1016/0022-5193(75)90111-3>
-- [R100] Flower, T. (2011). Fork-tailed drongos use deceptive mimicked alarm calls to steal food. *Proceedings of the Royal Society B*, 278(1711), 1548–1555. https://doi.org/10.1098/rspb.2010.1932
-- [R101] Flower, T. P., Gribble, M., Ridley, A. R. (2014). Deception by flexible alarm mimicry in an African bird. *Science*, 344(6183), 513–516. https://doi.org/10.1126/science.1249723
-- [R102] Ridley, A. R., Child, M. F., Bell, M. B. V. (2007). Interspecific audience effects on the alarm-calling behaviour of a kleptoparasitic bird. *Biology Letters*, 3(6), 589–591. https://doi.org/10.1098/rsbl.2007.0325
+- [R76] Bretscher, P., Cohn, M. (1970). A theory of self-nonself discrimination. *Science*, 169(3950), 1042–1049. <https://doi.org/10.1126/science.169.3950.1042>
+- [R77] Jenkins, M. K., Schwartz, R. H. (1987). Antigen presentation by chemically modified splenocytes induces antigen-specific T cell unresponsiveness in vitro and in vivo. *Journal of Experimental Medicine*, 165(2), 302–319. <https://doi.org/10.1084/jem.165.2.302>
+- [R78] Matzinger, P. (1994). Tolerance, danger, and the extended family. *Annual Review of Immunology*, 12, 991–1045. <https://doi.org/10.1146/annurev.iy.12.040194.005015>
+- [R79] Sakaguchi, S., Sakaguchi, N., Asano, M., Itoh, M., Toda, M. (1995). Immunologic self-tolerance maintained by activated T cells expressing IL-2 receptor α-chains (CD25): breakdown of a single mechanism of self-tolerance causes various autoimmune diseases. *Journal of Immunology*, 155(3), 1151–1164. <https://doi.org/10.4049/jimmunol.155.3.1151>
+- [R80] Nobel Prize Outreach. The Nobel Prize in Physiology or Medicine 2025: press release. 2025-10-06. <https://www.nobelprize.org/prizes/medicine/2025/press-release/>
+- [R81] Cunningham, M. W. (2014). Rheumatic fever, autoimmunity, and molecular mimicry: the streptococcal connection. *International Reviews of Immunology*, 33(4), 314–329. <https://doi.org/10.3109/08830185.2014.917411>
+- [R82] Yuki, N., Susuki, K., Koga, M., et al. (2004). Carbohydrate mimicry between human ganglioside GM1 and *Campylobacter jejuni* lipooligosaccharide causes Guillain–Barré syndrome. *PNAS*, 101(31), 11404–11409. <https://doi.org/10.1073/pnas.0402391101>
+- [R83] Kärre, K., Ljunggren, H. G., Piontek, G., Kiessling, R. (1986). Selective rejection of H-2-deficient lymphoma variants suggests alternative immune defence strategy. *Nature*, 319(6055), 675–678. <https://doi.org/10.1038/319675a0>
+- [R84] Hansen, T. H., Bouvier, M. (2009). MHC class I antigen presentation: learning from viral evasion strategies. *Nature Reviews Immunology*, 9(7), 503–513. <https://doi.org/10.1038/nri2575>
+- [R85] Doitsh, G., Galloway, N. L., Geng, X., et al. (2014). Cell death by pyroptosis drives CD4 T-cell depletion in HIV-1 infection. *Nature*, 505(7484), 509–514. <https://doi.org/10.1038/nature12940>
+- [R86] Bshary, R., Grutter, A. S. (2006). Image scoring and cooperation in a cleaner fish mutualism. *Nature*, 441(7096), 975–978. <https://doi.org/10.1038/nature04755>
+- [R87] Kiers, E. T., Rousseau, R. A., West, S. A., Denison, R. F. (2003). Host sanctions and the legume–rhizobium mutualism. *Nature*, 425(6953), 78–81. <https://doi.org/10.1038/nature01931>
+- [R88] Jandér, K. C., Herre, E. A. (2010). Host sanctions and pollinator cheating in the fig tree–fig wasp mutualism. *Proceedings of the Royal Society B*, 277(1687), 1481–1488. <https://doi.org/10.1098/rspb.2009.2157>
+- [R89] Visscher, P. K. (1996). Reproductive conflict in honey bees: a stalemate of worker egg-laying and policing. *Behavioral Ecology and Sociobiology*, 39(4), 237–244. <https://doi.org/10.1007/s002650050286> ；全文：<https://bees.ucr.edu/media/161/download>
+- [R90] Wenseleers, T., Ratnieks, F. L. W. (2006). Enforced altruism in insect societies. *Nature*, 444(7115), 50. <https://doi.org/10.1038/444050a>
+- [R91] Neumann, P., Pirk, C. W. W. (2019). Increased response to sequential infections of honeybee, *Apis mellifera scutellata*, colonies by socially parasitic Cape honeybee, *A. m. capensis*, workers. *Scientific Reports*, 9, 7582. <https://doi.org/10.1038/s41598-019-43920-1>
+- [R92] Barbero, F., Thomas, J. A., Bonelli, S., Balletto, E., Schönrogge, K. (2009). Queen ants make distinctive sounds that are mimicked by a butterfly social parasite. *Science*, 323(5915), 782–785. <https://doi.org/10.1126/science.1163583>
+- [R93] Akino, T., Knapp, J. J., Thomas, J. A., Elmes, G. W. (1999). Chemical mimicry and host specificity in the butterfly *Maculinea rebeli*, a social parasite of *Myrmica* ant colonies. *Proceedings of the Royal Society B*, 266(1427), 1419–1426. <https://doi.org/10.1098/rspb.1999.0796>
+- [R94] Nash, D. R., Als, T. D., Maile, R., Jones, G. R., Boomsma, J. J. (2008). A mosaic of chemical coevolution in a large blue butterfly. *Science*, 319(5859), 88–90. <https://doi.org/10.1126/science.1149180>
+- [R95] Lotem, A., Nakamura, H., Zahavi, A. (1995). Constraints on egg discrimination and cuckoo–host co-evolution. *Animal Behaviour*, 49(5), 1185–1209. <https://doi.org/10.1006/anbe.1995.0152>
+- [R96] Soler, M., Soler, J. J., Martinez, J. G., Møller, A. P. (1995). Magpie host manipulation by great spotted cuckoos: evidence for an avian mafia? *Evolution*, 49(4), 770–775. <https://doi.org/10.1111/j.1558-5646.1995.tb02312.x>
+- [R97] Strassmann, J. E., Zhu, Y., Queller, D. C. (2000). Altruism and social cheating in the social amoeba *Dictyostelium discoideum*. *Nature*, 408(6815), 965–967. <https://doi.org/10.1038/35050087>
+- [R98] Gardner, A., West, S. A. (2010). Greenbeards. *Evolution*, 64(1), 25–38. <https://doi.org/10.1111/j.1558-5646.2009.00842.x>
+- [R99] Grafen, A. (1990). Biological signals as handicaps. *Journal of Theoretical Biology*, 144(4), 517–546. <https://doi.org/10.1016/S0022-5193(05)80088-8> ；Zahavi, A. (1975). Mate selection—a selection for a handicap. *J Theor Biol*, 53(1), 205–214. <https://doi.org/10.1016/0022-5193(75)90111-3>
+- [R100] Flower, T. (2011). Fork-tailed drongos use deceptive mimicked alarm calls to steal food. *Proceedings of the Royal Society B*, 278(1711), 1548–1555. <https://doi.org/10.1098/rspb.2010.1932>
+- [R101] Flower, T. P., Gribble, M., Ridley, A. R. (2014). Deception by flexible alarm mimicry in an African bird. *Science*, 344(6183), 513–516. <https://doi.org/10.1126/science.1249723>
+- [R102] Ridley, A. R., Child, M. F., Bell, M. B. V. (2007). Interspecific audience effects on the alarm-calling behaviour of a kleptoparasitic bird. *Biology Letters*, 3(6), 589–591. <https://doi.org/10.1098/rsbl.2007.0325>
 
 ### 實驗經濟與社會科學 (Experimental economics and social science)
-- [R103] Fehr, E., Gächter, S. (2002). Altruistic punishment in humans. *Nature*, 415(6868), 137–140. https://doi.org/10.1038/415137a
-- [R104] Herrmann, B., Thöni, C., Gächter, S. (2008). Antisocial punishment across societies. *Science*, 319(5868), 1362–1367. https://doi.org/10.1126/science.1153808
-- [R105] Gneezy, U., Rustichini, A. (2000). A fine is a price. *Journal of Legal Studies*, 29(1), 1–17. https://doi.org/10.1086/468061
-- [R106] Nowak, M. A., Sigmund, K. (1992). Tit for tat in heterogeneous populations. *Nature*, 355(6357), 250–253. https://doi.org/10.1038/355250a0
-- [R107] Dyck, A., Morse, A., Zingales, L. (2010). Who blows the whistle on corporate fraud? *Journal of Finance*, 65(6), 2213–2253. https://doi.org/10.1111/j.1540-6261.2010.01614.x
-- [R108] Ostrom, E. (1990). *Governing the Commons*. Cambridge University Press. https://doi.org/10.1017/CBO9780511807763
-- [R109] Cox, M., Arnold, G., Villamayor Tomás, S. (2010). A review of design principles for community-based natural resource management. *Ecology and Society*, 15(4), 38. https://doi.org/10.5751/ES-03704-150438
-- [R110] Kreps, D. M., Wilson, R. (1982). Reputation and imperfect information. *Journal of Economic Theory*, 27(2), 253–279. https://doi.org/10.1016/0022-0531(82)90030-8
+- [R103] Fehr, E., Gächter, S. (2002). Altruistic punishment in humans. *Nature*, 415(6868), 137–140. <https://doi.org/10.1038/415137a>
+- [R104] Herrmann, B., Thöni, C., Gächter, S. (2008). Antisocial punishment across societies. *Science*, 319(5868), 1362–1367. <https://doi.org/10.1126/science.1153808>
+- [R105] Gneezy, U., Rustichini, A. (2000). A fine is a price. *Journal of Legal Studies*, 29(1), 1–17. <https://doi.org/10.1086/468061>
+- [R106] Nowak, M. A., Sigmund, K. (1992). Tit for tat in heterogeneous populations. *Nature*, 355(6357), 250–253. <https://doi.org/10.1038/355250a0>
+- [R107] Dyck, A., Morse, A., Zingales, L. (2010). Who blows the whistle on corporate fraud? *Journal of Finance*, 65(6), 2213–2253. <https://doi.org/10.1111/j.1540-6261.2010.01614.x>
+- [R108] Ostrom, E. (1990). *Governing the Commons*. Cambridge University Press. <https://doi.org/10.1017/CBO9780511807763>
+- [R109] Cox, M., Arnold, G., Villamayor Tomás, S. (2010). A review of design principles for community-based natural resource management. *Ecology and Society*, 15(4), 38. <https://doi.org/10.5751/ES-03704-150438>
+- [R110] Kreps, D. M., Wilson, R. (1982). Reputation and imperfect information. *Journal of Economic Theory*, 27(2), 253–279. <https://doi.org/10.1016/0022-0531(82)90030-8>
 
 ### 歷史、情報與法律 (History, intelligence, law)
-- [R111] The Code of Hammurabi. Trans. L. W. King. Avalon Project, Yale Law School. https://avalon.law.yale.edu/ancient/hamcode.asp
-- [R112] Deuteronomy 19:15–21 (NRSVUE). https://www.biblegateway.com/passage/?search=Deuteronomy+19%3A15-21&version=NRSVUE
-- [R113] Long, G. Calumnia. In W. Smith (Ed.), *A Dictionary of Greek and Roman Antiquities* (1875), 234–235. https://penelope.uchicago.edu/Thayer/E/Roman/Texts/secondary/SMIGRA*/Calumnia.html
-- [R114] Roth, J. M. (2025). The Trust. *The Intelligencer: Journal of U.S. Intelligence Studies*, 30(1), 69–77. https://www.afio.com/assets/publications/excerpts/roth-the-trust-afio-intelligencer-vol30-no1-winterspring-2025.pdf
+- [R111] The Code of Hammurabi. Trans. L. W. King. Avalon Project, Yale Law School. <https://avalon.law.yale.edu/ancient/hamcode.asp>
+- [R112] Deuteronomy 19:15–21 (NRSVUE). <https://www.biblegateway.com/passage/?search=Deuteronomy+19%3A15-21&version=NRSVUE>
+- [R113] Long, G. Calumnia. In W. Smith (Ed.), *A Dictionary of Greek and Roman Antiquities* (1875), 234–235. <https://penelope.uchicago.edu/Thayer/E/Roman/Texts/secondary/SMIGRA*/Calumnia.html>
+- [R114] Roth, J. M. (2025). The Trust. *The Intelligencer: Journal of U.S. Intelligence Studies*, 30(1), 69–77. <https://www.afio.com/assets/publications/excerpts/roth-the-trust-afio-intelligencer-vol30-no1-winterspring-2025.pdf>
 - [R115] Geifman, A. (2000). *Entangled in Terror: The Azef Affair and the Russian Revolution*. Scholarly Resources. 另見：The exposure of Azef, a modern "Judas": facts and legends. Bar-Ilan University. <https://cris.biu.ac.il/en/publications/the-exposure-of-azef-a-modern-judas-facts-and-legends/>
 - [R116] Elwood, R. C. (1977). *Roman Malinovsky: A Life Without a Cause*. Oriental Research Partners. 列寧 1917 年的說明：<https://www.marxists.org/archive/lenin/works/1917/jun/30b.htm>
-- [R117] U.S. Senate Select Committee to Study Governmental Operations with Respect to Intelligence Activities (1976). *Final Report, Book III: COINTELPRO: The FBI's Covert Action Programs Against American Citizens*. S. Rep. No. 94-755. https://aarclibrary.org/publib/church/reports/book3/pdf/ChurchB3_1_COINTELPRO.pdf
-- [R118] Cram, C. C. (1993). *Of Moles and Molehunters: A Review of Counterintelligence Literature, 1977–92*. CIA Center for the Study of Intelligence. https://www.cia.gov/resources/csi/static/Of-Moles-and-Molehunters-1.pdf
-- [R119] U.S. Senate Select Committee on Intelligence (1994). *An Assessment of the Aldrich H. Ames Espionage Case and Its Implications for U.S. Intelligence*. https://irp.fas.org/congress/1994_rpt/ssci_ames.htm
-- [R120] U.S. Department of Justice, Office of the Inspector General (2003). *A Review of the FBI's Performance in Deterring, Detecting, and Investigating the Espionage Activities of Robert Philip Hanssen*. https://oig.justice.gov/special/0308/index.htm
-- [R121] Mowbray, M., Gollmann, D. (2007). Electing the Doge of Venice: analysis of a 13th century protocol. *20th IEEE Computer Security Foundations Symposium*, 295–310. https://doi.org/10.1109/CSF.2007.21 ；全文：<https://gwern.net/doc/cs/security/2007-mowbray.pdf>
-- [R122] Aristotle. *Athenian Constitution* 63–64. Trans. H. Rackham. Perseus Digital Library. https://www.perseus.tufts.edu/hopper/text?doc=Perseus:text:1999.01.0046:chapter=63
-- [R123] U.S. Department of Energy. Order 5610.11, Chapter III: Two-person concept. https://nuke.fas.org/guide/usa/doctrine/doe/o5610_11/o5610_11c3.htm
+- [R117] U.S. Senate Select Committee to Study Governmental Operations with Respect to Intelligence Activities (1976). *Final Report, Book III: COINTELPRO: The FBI's Covert Action Programs Against American Citizens*. S. Rep. No. 94-755. <https://aarclibrary.org/publib/church/reports/book3/pdf/ChurchB3_1_COINTELPRO.pdf>
+- [R118] Cram, C. C. (1993). *Of Moles and Molehunters: A Review of Counterintelligence Literature, 1977–92*. CIA Center for the Study of Intelligence. <https://www.cia.gov/resources/csi/static/Of-Moles-and-Molehunters-1.pdf>
+- [R119] U.S. Senate Select Committee on Intelligence (1994). *An Assessment of the Aldrich H. Ames Espionage Case and Its Implications for U.S. Intelligence*. <https://irp.fas.org/congress/1994_rpt/ssci_ames.htm>
+- [R120] U.S. Department of Justice, Office of the Inspector General (2003). *A Review of the FBI's Performance in Deterring, Detecting, and Investigating the Espionage Activities of Robert Philip Hanssen*. <https://oig.justice.gov/special/0308/index.htm>
+- [R121] Mowbray, M., Gollmann, D. (2007). Electing the Doge of Venice: analysis of a 13th century protocol. *20th IEEE Computer Security Foundations Symposium*, 295–310. <https://doi.org/10.1109/CSF.2007.21> ；全文：<https://gwern.net/doc/cs/security/2007-mowbray.pdf>
+- [R122] Aristotle. *Athenian Constitution* 63–64. Trans. H. Rackham. Perseus Digital Library. <https://www.perseus.tufts.edu/hopper/text?doc=Perseus:text:1999.01.0046:chapter=63>
+- [R123] U.S. Department of Energy. Order 5610.11, Chapter III: Two-person concept. <https://nuke.fas.org/guide/usa/doctrine/doe/o5610_11/o5610_11c3.htm>
 - [R124] 司馬遷。《史記·商君列傳》（卷六十八）。維基文庫。<https://zh.wikisource.org/wiki/史記/卷068>
 - [R125] 《宋史·兵志六》（卷一百九十二）。維基文庫。<https://zh.wikisource.org/wiki/宋史/卷192>
-- [R126] Greif, A. (1993). Contract enforceability and economic institutions in early trade: the Maghribi traders' coalition. *American Economic Review*, 83(3), 525–548. https://www.jstor.org/stable/2117532
-- [R127] Edwards, J., Ogilvie, S. (2012). Contract enforcement, institutions, and social capital: the Maghribi traders reappraised. *Economic History Review*, 65(2), 421–444. https://doi.org/10.1111/j.1468-0289.2011.00635.x
-- [R128] Giné, X., Karlan, D. S. (2014). Group versus individual liability: short and long term evidence from Philippine microcredit lending groups. *Journal of Development Economics*, 107, 65–83. https://doi.org/10.1016/j.jdeveco.2013.11.003
+- [R126] Greif, A. (1993). Contract enforceability and economic institutions in early trade: the Maghribi traders' coalition. *American Economic Review*, 83(3), 525–548. <https://www.jstor.org/stable/2117532>
+- [R127] Edwards, J., Ogilvie, S. (2012). Contract enforcement, institutions, and social capital: the Maghribi traders reappraised. *Economic History Review*, 65(2), 421–444. <https://doi.org/10.1111/j.1468-0289.2011.00635.x>
+- [R128] Giné, X., Karlan, D. S. (2014). Group versus individual liability: short and long term evidence from Philippine microcredit lending groups. *Journal of Development Economics*, 107, 65–83. <https://doi.org/10.1016/j.jdeveco.2013.11.003>
 - [R129] Wandall, R. H., Suter, D., Ivan-Cucu, G. (2019). *Misuse of Interpol's Red Notices and impact on human rights – recent developments*. European Parliament, PE 603.472. <https://www.europarl.europa.eu/thinktank/en/document/EXPO_STU(2019)603472> ；PACE Resolution 2161 (2017)：<https://pace.coe.int/files/23714/html>
-- [R130] INTERPOL. Commission for the Control of INTERPOL's Files (CCF). https://www.interpol.int/en/Who-we-are/Commission-for-the-Control-of-INTERPOL-s-Files-CCF
-- [R131] CBC News. Quebec police admit they went undercover at Montebello protest. 2007-08-23. https://www.cbc.ca/news/canada/quebec-police-admit-they-went-undercover-at-montebello-protest-1.656171
-- [R132] 31 U.S.C. § 3730 (False Claims Act: civil actions for false claims). Cornell LII. https://www.law.cornell.edu/uscode/text/31/3730
-- [R133] Frankpledge. *The Oxford Companion to British History*, via Encyclopedia.com. https://www.encyclopedia.com/history/modern-europe/british-and-irish-history/frankpledge
-- [R134] The National Archives (UK). Confessions from the Cambridge Five. 2025-01. https://www.nationalarchives.gov.uk/explore-the-collection/the-collection-blog/confessions-from-the-cambridge-five/
+- [R130] INTERPOL. Commission for the Control of INTERPOL's Files (CCF). <https://www.interpol.int/en/Who-we-are/Commission-for-the-Control-of-INTERPOL-s-Files-CCF>
+- [R131] CBC News. Quebec police admit they went undercover at Montebello protest. 2007-08-23. <https://www.cbc.ca/news/canada/quebec-police-admit-they-went-undercover-at-montebello-protest-1.656171>
+- [R132] 31 U.S.C. § 3730 (False Claims Act: civil actions for false claims). Cornell LII. <https://www.law.cornell.edu/uscode/text/31/3730>
+- [R133] Frankpledge. *The Oxford Companion to British History*, via Encyclopedia.com. <https://www.encyclopedia.com/history/modern-europe/british-and-irish-history/frankpledge>
+- [R134] The National Archives (UK). Confessions from the Cambridge Five. 2025-01. <https://www.nationalarchives.gov.uk/explore-the-collection/the-collection-blog/confessions-from-the-cambridge-five/>
 
 ### 選舉 (Elections)
-- [R135] Klimek, P., Yegorov, Y., Hanel, R., Thurner, S. (2012). Statistical detection of systematic election irregularities. *PNAS*, 109(41), 16469–16473. https://doi.org/10.1073/pnas.1210722109
-- [R136] Callen, M., Long, J. D. (2015). Institutional corruption and election fraud: evidence from a field experiment in Afghanistan. *American Economic Review*, 105(1), 354–381. https://doi.org/10.1257/aer.20120427
-- [R137] Lindeman, M., Stark, P. B. (2012). A gentle introduction to risk-limiting audits. *IEEE Security & Privacy*, 10(5), 42–49. https://doi.org/10.1109/MSP.2012.56
-- [R138] Rivest, R. L. (2008). On the notion of "software independence" in voting systems. *Philosophical Transactions of the Royal Society A*, 366(1881), 3759–3767. https://doi.org/10.1098/rsta.2008.0149
-- [R139] CISA. Joint statement from Elections Infrastructure Government Coordinating Council & the Election Infrastructure Sector Coordinating Executive Committees. 2020-11-12. https://www.cisa.gov/news-events/news/joint-statement-elections-infrastructure-government-coordinating-council-election
-- [R140] Thorn, A. A., Levi, D. F., Macy, J. (2021). 2020 election litigation: the courts held. *Judicature*, 105(1). https://judicature.duke.edu/articles/2020-election-litigation-the-courts-held/
-- [R141] 新頭殼。中選會主委李進勇相關報導。2024-01-15。https://newtalk.tw/news/view/2024-01-15/905398
-- [R142] 公視新聞網。中選會移送選舉謠言案相關報導。2024-01。https://news.pts.org.tw/article/677069
+- [R135] Klimek, P., Yegorov, Y., Hanel, R., Thurner, S. (2012). Statistical detection of systematic election irregularities. *PNAS*, 109(41), 16469–16473. <https://doi.org/10.1073/pnas.1210722109>
+- [R136] Callen, M., Long, J. D. (2015). Institutional corruption and election fraud: evidence from a field experiment in Afghanistan. *American Economic Review*, 105(1), 354–381. <https://doi.org/10.1257/aer.20120427>
+- [R137] Lindeman, M., Stark, P. B. (2012). A gentle introduction to risk-limiting audits. *IEEE Security & Privacy*, 10(5), 42–49. <https://doi.org/10.1109/MSP.2012.56>
+- [R138] Rivest, R. L. (2008). On the notion of "software independence" in voting systems. *Philosophical Transactions of the Royal Society A*, 366(1881), 3759–3767. <https://doi.org/10.1098/rsta.2008.0149>
+- [R139] CISA. Joint statement from Elections Infrastructure Government Coordinating Council & the Election Infrastructure Sector Coordinating Executive Committees. 2020-11-12. <https://www.cisa.gov/news-events/news/joint-statement-elections-infrastructure-government-coordinating-council-election>
+- [R140] Thorn, A. A., Levi, D. F., Macy, J. (2021). 2020 election litigation: the courts held. *Judicature*, 105(1). <https://judicature.duke.edu/articles/2020-election-litigation-the-courts-held/>
+- [R141] 新頭殼。中選會主委李進勇相關報導。2024-01-15。<https://newtalk.tw/news/view/2024-01-15/905398>
+- [R142] 公視新聞網。中選會移送選舉謠言案相關報導。2024-01。<https://news.pts.org.tw/article/677069>
 - [R143] 台灣事實查核中心。台南東區開票所影片（事實釐清）：<https://tfc-taiwan.org.tw/fact-check-reports/migration-10165/> ；桃園新屋開票所影片（易生誤解）：<https://tfc-taiwan.org.tw/fact-check-reports/migration-10209/>
-- [R144] The Carter Center. Carter Center statement on Venezuela election. 2024-07-30. https://www.cartercenter.org/news/venezuela-073024/
-- [R145] United Nations Panel of Electoral Experts. Interim report on Venezuela. 2024-08-09. https://news.un.org/en/sites/news.un.org.en/files/atoms/files/Interim_Report_PoE_Venezuela_090824.pdf
-- [R146] Electoral Reform Society. The Irish abortion referendum: how a citizens' assembly helped to break years of political deadlock. https://www.electoral-reform.org.uk/the-irish-abortion-referendum-how-a-citizens-assembly-helped-to-break-years-of-political-deadlock/
+- [R144] The Carter Center. Carter Center statement on Venezuela election. 2024-07-30. <https://www.cartercenter.org/news/venezuela-073024/>
+- [R145] United Nations Panel of Electoral Experts. Interim report on Venezuela. 2024-08-09. <https://news.un.org/en/sites/news.un.org.en/files/atoms/files/Interim_Report_PoE_Venezuela_090824.pdf>
+- [R146] Electoral Reform Society. The Irish abortion referendum: how a citizens' assembly helped to break years of political deadlock. <https://www.electoral-reform.org.uk/the-irish-abortion-referendum-how-a-citizens-assembly-helped-to-break-years-of-political-deadlock/>
 
 ### 新聞與媒體 (News and media)
-- [R147] Heinrich-Böll-Stiftung. Data visualization: how the pro-government media empire owning 476 outlets was formed. 2018-12-21. https://www.boell.de/en/2018/12/21/data-visualization-how-pro-government-media-empire-owning-476-outlets-was-formed
-- [R148] Insight Hungary (444.hu). Court says pro-government media merger was unlawfully approved. 2020-01-30. https://insighthungary.444.hu/2020/01/30/court-says-pro-government-media-merger-was-unlawfully-approved
-- [R149] Committee to Protect Journalists. Attacks on the press in 2024. 2025-01. https://cpj.org/2025/01/attacks-on-the-press-in-2024/ ；2024 年監獄普查：<https://cpj.org/special-reports/in-record-year-china-israel-and-myanmar-are-worlds-leading-jailers-of-journalists/>
-- [R150] Committee to Protect Journalists. Malaysia issues first fake news conviction. 2018-04. https://cpj.org/2018/04/malaysia-issues-first-fake-news-conviction/
-- [R151] Malay Mail. Dewan Negara passes repeal of Anti-Fake News Act. 2019-12-19. https://www.malaymail.com/news/malaysia/2019/12/19/dewan-negara-passes-repeal-of-anti-fake-news-act/1820767
-- [R152] CEN. CWA 17493:2019 Journalism Trust Initiative. https://www.cencenelec.eu/media/CEN-CENELEC/CWAs/ICT/cwa17493.pdf ；JTI 常見問題（自評與外部稽核）：<https://journalismtrustinitiative.org/frequently-asked-questions/>
-- [R153] IFCN Code of Principles. Application process. https://ifcncodeofprinciples.poynter.org/application-process
-- [R154] DFRLab. Russian Telegram channel embraces fact-checking tropes to spread disinformation. 2022-03-07. https://dfrlab.org/2022/03/07/russian-telegram-channel-embraces-fact-checking-tropes-to-spread-disinformation/
-- [R155] EDMO. Putin's new plan to undermine fact-checking. https://edmo.eu/publications/putins-new-plan-to-undermine-fact-checking/ ；RSF 的時間整理：<https://rsf.org/en/russia-fact-checking-kremlins-latest-propaganda-tool>
-- [R156] EU DisinfoLab, Qurium. Doppelganger: media clones serving Russian propaganda. 2022-09-27. https://www.disinfo.eu/doppelganger
-- [R157] U.S. Department of Justice. Justice Department disrupts covert Russian government-sponsored foreign malign influence operation. 2024-09-04. https://www.justice.gov/archives/opa/pr/justice-department-disrupts-covert-russian-government-sponsored-foreign-malign-influence ；副本：<https://mcac.maryland.gov/2024/09/justice-department-disrupts-covert-russian-government-sponsored-foreign-malign-influence-operation-targeting-audiences-in-the-united-states-and-elsewhere/>
-- [R158] Reuters Institute. Digital News Report 2025: executive summary. https://reutersinstitute.politics.ox.ac.uk/digital-news-report/2025/dnr-executive-summary
-- [R159] Reuters Institute. Digital News Report 2025: Taiwan. https://reutersinstitute.politics.ox.ac.uk/digital-news-report/2025/taiwan
+- [R147] Heinrich-Böll-Stiftung. Data visualization: how the pro-government media empire owning 476 outlets was formed. 2018-12-21. <https://www.boell.de/en/2018/12/21/data-visualization-how-pro-government-media-empire-owning-476-outlets-was-formed>
+- [R148] Insight Hungary (444.hu). Court says pro-government media merger was unlawfully approved. 2020-01-30. <https://insighthungary.444.hu/2020/01/30/court-says-pro-government-media-merger-was-unlawfully-approved>
+- [R149] Committee to Protect Journalists. Attacks on the press in 2024. 2025-01. <https://cpj.org/2025/01/attacks-on-the-press-in-2024/> ；2024 年監獄普查：<https://cpj.org/special-reports/in-record-year-china-israel-and-myanmar-are-worlds-leading-jailers-of-journalists/>
+- [R150] Committee to Protect Journalists. Malaysia issues first fake news conviction. 2018-04. <https://cpj.org/2018/04/malaysia-issues-first-fake-news-conviction/>
+- [R151] Malay Mail. Dewan Negara passes repeal of Anti-Fake News Act. 2019-12-19. <https://www.malaymail.com/news/malaysia/2019/12/19/dewan-negara-passes-repeal-of-anti-fake-news-act/1820767>
+- [R152] CEN. CWA 17493:2019 Journalism Trust Initiative. <https://www.cencenelec.eu/media/CEN-CENELEC/CWAs/ICT/cwa17493.pdf> ；JTI 常見問題（自評與外部稽核）：<https://journalismtrustinitiative.org/frequently-asked-questions/>
+- [R153] IFCN Code of Principles. Application process. <https://ifcncodeofprinciples.poynter.org/application-process>
+- [R154] DFRLab. Russian Telegram channel embraces fact-checking tropes to spread disinformation. 2022-03-07. <https://dfrlab.org/2022/03/07/russian-telegram-channel-embraces-fact-checking-tropes-to-spread-disinformation/>
+- [R155] EDMO. Putin's new plan to undermine fact-checking. <https://edmo.eu/publications/putins-new-plan-to-undermine-fact-checking/> ；RSF 的時間整理：<https://rsf.org/en/russia-fact-checking-kremlins-latest-propaganda-tool>
+- [R156] EU DisinfoLab, Qurium. Doppelganger: media clones serving Russian propaganda. 2022-09-27. <https://www.disinfo.eu/doppelganger>
+- [R157] U.S. Department of Justice. Justice Department disrupts covert Russian government-sponsored foreign malign influence operation. 2024-09-04. <https://www.justice.gov/archives/opa/pr/justice-department-disrupts-covert-russian-government-sponsored-foreign-malign-influence> ；副本：<https://mcac.maryland.gov/2024/09/justice-department-disrupts-covert-russian-government-sponsored-foreign-malign-influence-operation-targeting-audiences-in-the-united-states-and-elsewhere/>
+- [R158] Reuters Institute. Digital News Report 2025: executive summary. <https://reutersinstitute.politics.ox.ac.uk/digital-news-report/2025/dnr-executive-summary>
+- [R159] Reuters Institute. Digital News Report 2025: Taiwan. <https://reutersinstitute.politics.ox.ac.uk/digital-news-report/2025/taiwan>
 
 ### 身分系統與商業 (Identity systems and business)
-- [R160] SolarWinds Corporation. Form 8-K. 2020-12-14. https://www.sec.gov/Archives/edgar/data/1739942/000162828020017451/swi-20201214.htm
-- [R161] Krebs, B. A closer look at the LAPSUS$ data extortion group. KrebsOnSecurity, 2022-03. https://krebsonsecurity.com/2022/03/a-closer-look-at-the-lapsus-data-extortion-group/
-- [R162] Cyber Safety Review Board (2023). Review of the attacks associated with Lapsus$ and related threat groups: executive summary. https://www.cisa.gov/sites/default/files/2023-08/Review%20Of%20The%20Attacks%20Associated%20with%20Lapsus%24%20And%20Related%20Threat%20Groups%20Executive%20Summary_508c.pdf
-- [R163] The Record. DHS review board: "cascade of security failures" at Microsoft led to China hack. 2024-04. https://therecord.media/dhs-cascade-of-security-failures-microsoft-china-hack
-- [R164] NIST (2025). SP 800-63-4: Digital Identity Guidelines. https://csrc.nist.gov/pubs/sp/800/63/4/final
-- [R165] NIST. SP 800-63B-4 supplement: syncable authenticators. https://pages.nist.gov/800-63-4/sp800-63b/syncable
-- [R166] U.S. SEC. Press release 2002-89 (Arthur Andersen). https://www.sec.gov/news/press/2002-89.htm
-- [R167] *Arthur Andersen LLP v. United States*, 544 U.S. 696 (2005). https://supreme.justia.com/cases/federal/us/544/696/
-- [R168] Deutscher Bundestag. Drucksache 19/23268. https://dserver.bundestag.de/btd/19/232/1923268.pdf
-- [R169] Committee to Protect Journalists. Q&A: Financial Times reporters Dan McCrum and Stefania Palma on Wirecard. 2020-10. https://cpj.org/2020/10/qa-financial-times-reporters-dan-mccrum-and-stefania-palma-on-wirecard-and-pressures-on-business-journalists/
-- [R170] Financial Crisis Inquiry Commission (2011). *The Financial Crisis Inquiry Report*, p. xxv. https://www.govinfo.gov/content/pkg/GPO-FCIC/pdf/GPO-FCIC.pdf
-- [R171] Cong, L. W., Li, X., Tang, K., Yang, Y. (2023). Crypto wash trading. *Management Science*, 69(11), 6427–6454. https://doi.org/10.1287/mnsc.2021.02709
-- [R172] U.S. Attorney's Office, SDNY. Samuel Bankman-Fried sentenced to 25 years in prison. 2024-03-28. https://www.justice.gov/usao-sdny/pr/samuel-bankman-fried-sentenced-25-years-prison
+- [R160] SolarWinds Corporation. Form 8-K. 2020-12-14. <https://www.sec.gov/Archives/edgar/data/1739942/000162828020017451/swi-20201214.htm>
+- [R161] Krebs, B. A closer look at the LAPSUS$ data extortion group. KrebsOnSecurity, 2022-03. <https://krebsonsecurity.com/2022/03/a-closer-look-at-the-lapsus-data-extortion-group/>
+- [R162] Cyber Safety Review Board (2023). Review of the attacks associated with Lapsus$ and related threat groups: executive summary. <https://www.cisa.gov/sites/default/files/2023-08/Review%20Of%20The%20Attacks%20Associated%20with%20Lapsus%24%20And%20Related%20Threat%20Groups%20Executive%20Summary_508c.pdf>
+- [R163] The Record. DHS review board: "cascade of security failures" at Microsoft led to China hack. 2024-04. <https://therecord.media/dhs-cascade-of-security-failures-microsoft-china-hack>
+- [R164] NIST (2025). SP 800-63-4: Digital Identity Guidelines. <https://csrc.nist.gov/pubs/sp/800/63/4/final>
+- [R165] NIST. SP 800-63B-4 supplement: syncable authenticators. <https://pages.nist.gov/800-63-4/sp800-63b/syncable>
+- [R166] U.S. SEC. Press release 2002-89 (Arthur Andersen). <https://www.sec.gov/news/press/2002-89.htm>
+- [R167] *Arthur Andersen LLP v. United States*, 544 U.S. 696 (2005). <https://supreme.justia.com/cases/federal/us/544/696/>
+- [R168] Deutscher Bundestag. Drucksache 19/23268. <https://dserver.bundestag.de/btd/19/232/1923268.pdf>
+- [R169] Committee to Protect Journalists. Q&A: Financial Times reporters Dan McCrum and Stefania Palma on Wirecard. 2020-10. <https://cpj.org/2020/10/qa-financial-times-reporters-dan-mccrum-and-stefania-palma-on-wirecard-and-pressures-on-business-journalists/>
+- [R170] Financial Crisis Inquiry Commission (2011). *The Financial Crisis Inquiry Report*, p. xxv. <https://www.govinfo.gov/content/pkg/GPO-FCIC/pdf/GPO-FCIC.pdf>
+- [R171] Cong, L. W., Li, X., Tang, K., Yang, Y. (2023). Crypto wash trading. *Management Science*, 69(11), 6427–6454. <https://doi.org/10.1287/mnsc.2021.02709>
+- [R172] U.S. Attorney's Office, SDNY. Samuel Bankman-Fried sentenced to 25 years in prison. 2024-03-28. <https://www.justice.gov/usao-sdny/pr/samuel-bankman-fried-sentenced-25-years-prison>
 
 ### 延伸章節：AI、正當性、多份名單與決策 (Extensions: AI, legitimacy, multiple lists, decisions)
-- [R173] Ma, Z., Austgen, J., Mason, J., Durumeric, Z., Bailey, M. (2021). Tracing your roots: exploring the TLS trust anchor ecosystem. *IMC '21*. https://doi.org/10.1145/3487552.3487813 ；全文：<https://zakird.com/papers/roots.pdf>
-- [R174] Chromium. Chrome Root Store FAQ. https://chromium.googlesource.com/chromium/src/+/main/net/data/ssl/chrome_root_store/faq.md
-- [R175] Thayer, W. Update on the distrust of Symantec TLS certificates. Mozilla Security Blog, 2018-07-30. https://blog.mozilla.org/security/2018/07/30/update-on-the-distrust-of-symantec-tls-certificates/
-- [R176] The Register. Google Chrome to distrust Camerfirma certificates. 2021-02-02. https://www.theregister.com/2021/02/02/chrome_camerfirma_certificates/
-- [R177] Mozilla Bugzilla. Bug 1692094: turn off websites trust bit for Camerfirma roots. 2021-02. https://bugzilla.mozilla.org/show_bug.cgi?id=1692094
-- [R178] Apple. Distrust of Camerfirma and Entrust certificates (support article 121668). https://support.apple.com/en-us/121668
-- [R179] Google Security Blog. Sustaining digital certificate security – Entrust certificate distrust. 2024-06-27. https://security.googleblog.com/2024/06/sustaining-digital-certificate-security.html
-- [R180] Wilson, B. Entrust distrust decision. Mozilla dev-security-policy, 2024-07-31. https://groups.google.com/a/mozilla.org/g/dev-security-policy/c/jCvkhBjg9Yw/m/dzO2v1AtAQAJ
-- [R181] Raman, A., Joglekar, S., De Cristofaro, E., Sastry, N., Tyson, G. (2019). Challenges in the decentralised web: the Mastodon case. *IMC '19*, 217–229. https://doi.org/10.1145/3355369.3355572
-- [R182] Colglazier, C., TeBlunthuis, N., Shaw, A. (2024). The effects of group sanctions on participation and toxicity: quasi-experimental evidence from the fediverse. *Proceedings of ICWSM*, 18(1), 315–328. https://doi.org/10.1609/icwsm.v18i1.31316
-- [R183] Jhaver, S., Ghoshal, S., Bruckman, A., Gilbert, E. (2018). Online harassment and content moderation: the case of blocklists. *ACM TOCHI*, 25(2), Article 12. https://doi.org/10.1145/3185593
-- [R184] Sinha, S., Bailey, M., Jahanian, F. (2008). Shades of grey: on the effectiveness of reputation-based "blacklists". *MALWARE 2008*, 57–64. https://doi.org/10.1109/MALWARE.2008.4690858
-- [R185] Joint Task Force Transformation Initiative (2012). *NIST SP 800-30 Rev. 1: Guide for Conducting Risk Assessments*. https://doi.org/10.6028/NIST.SP.800-30r1
-- [R186] Elkan, C. (2001). The foundations of cost-sensitive learning. *IJCAI-01*, 973–978. https://cseweb.ucsd.edu/~elkan/rescale.pdf
-- [R187] Blackstone, W. (1769). *Commentaries on the Laws of England*, Book 4, Chapter 27, p. 352. Avalon Project. https://avalon.law.yale.edu/18th_century/blackstone_bk4ch27.asp
-- [R188] Gordon, L. A., Loeb, M. P. (2002). The economics of information security investment. *ACM TISSEC*, 5(4), 438–457. https://doi.org/10.1145/581271.581274
-- [R189] Kleinberg, J., Mullainathan, S., Raghavan, M. (2017). Inherent trade-offs in the fair determination of risk scores. *ITCS 2017*, LIPIcs 67, 43. https://doi.org/10.4230/LIPIcs.ITCS.2017.43
-- [R190] Chouldechova, A. (2017). Fair prediction with disparate impact: a study of bias in recidivism prediction instruments. *Big Data*, 5(2), 153–163. https://doi.org/10.1089/big.2016.0047
-- [R191] Appeals Centre Europe. Transparency report, April 2025 to March 2026. 2026-05. https://www.appealscentre.eu/wp-content/uploads/2026/05/Transparency-Report-May-2026-English.pdf
-- [R192] Jakesch, M., Hancock, J. T., Naaman, M. (2023). Human heuristics for AI-generated language are flawed. *PNAS*, 120(11), e2208839120. https://doi.org/10.1073/pnas.2208839120
-- [R193] Goldstein, J. A., Chao, J., Grossman, S., Stamos, A., Tomz, M. (2024). How persuasive is AI-generated propaganda? *PNAS Nexus*, 3(2), pgae034. https://doi.org/10.1093/pnasnexus/pgae034
-- [R194] OpenAI. Disrupting deceptive uses of AI by covert influence operations. 2024-05-30. https://openai.com/index/disrupting-deceptive-uses-of-ai-by-covert-influence-operations/
+- [R173] Ma, Z., Austgen, J., Mason, J., Durumeric, Z., Bailey, M. (2021). Tracing your roots: exploring the TLS trust anchor ecosystem. *IMC '21*. <https://doi.org/10.1145/3487552.3487813> ；全文：<https://zakird.com/papers/roots.pdf>
+- [R174] Chromium. Chrome Root Store FAQ. <https://chromium.googlesource.com/chromium/src/+/main/net/data/ssl/chrome_root_store/faq.md>
+- [R175] Thayer, W. Update on the distrust of Symantec TLS certificates. Mozilla Security Blog, 2018-07-30. <https://blog.mozilla.org/security/2018/07/30/update-on-the-distrust-of-symantec-tls-certificates/>
+- [R176] The Register. Google Chrome to distrust Camerfirma certificates. 2021-02-02. <https://www.theregister.com/2021/02/02/chrome_camerfirma_certificates/>
+- [R177] Mozilla Bugzilla. Bug 1692094: turn off websites trust bit for Camerfirma roots. 2021-02. <https://bugzilla.mozilla.org/show_bug.cgi?id=1692094>
+- [R178] Apple. Distrust of Camerfirma and Entrust certificates (support article 121668). <https://support.apple.com/en-us/121668>
+- [R179] Google Security Blog. Sustaining digital certificate security – Entrust certificate distrust. 2024-06-27. <https://security.googleblog.com/2024/06/sustaining-digital-certificate-security.html>
+- [R180] Wilson, B. Entrust distrust decision. Mozilla dev-security-policy, 2024-07-31. <https://groups.google.com/a/mozilla.org/g/dev-security-policy/c/jCvkhBjg9Yw/m/dzO2v1AtAQAJ>
+- [R181] Raman, A., Joglekar, S., De Cristofaro, E., Sastry, N., Tyson, G. (2019). Challenges in the decentralised web: the Mastodon case. *IMC '19*, 217–229. <https://doi.org/10.1145/3355369.3355572>
+- [R182] Colglazier, C., TeBlunthuis, N., Shaw, A. (2024). The effects of group sanctions on participation and toxicity: quasi-experimental evidence from the fediverse. *Proceedings of ICWSM*, 18(1), 315–328. <https://doi.org/10.1609/icwsm.v18i1.31316>
+- [R183] Jhaver, S., Ghoshal, S., Bruckman, A., Gilbert, E. (2018). Online harassment and content moderation: the case of blocklists. *ACM TOCHI*, 25(2), Article 12. <https://doi.org/10.1145/3185593>
+- [R184] Sinha, S., Bailey, M., Jahanian, F. (2008). Shades of grey: on the effectiveness of reputation-based "blacklists". *MALWARE 2008*, 57–64. <https://doi.org/10.1109/MALWARE.2008.4690858>
+- [R185] Joint Task Force Transformation Initiative (2012). *NIST SP 800-30 Rev. 1: Guide for Conducting Risk Assessments*. <https://doi.org/10.6028/NIST.SP.800-30r1>
+- [R186] Elkan, C. (2001). The foundations of cost-sensitive learning. *IJCAI-01*, 973–978. <https://cseweb.ucsd.edu/~elkan/rescale.pdf>
+- [R187] Blackstone, W. (1769). *Commentaries on the Laws of England*, Book 4, Chapter 27, p. 352. Avalon Project. <https://avalon.law.yale.edu/18th_century/blackstone_bk4ch27.asp>
+- [R188] Gordon, L. A., Loeb, M. P. (2002). The economics of information security investment. *ACM TISSEC*, 5(4), 438–457. <https://doi.org/10.1145/581271.581274>
+- [R189] Kleinberg, J., Mullainathan, S., Raghavan, M. (2017). Inherent trade-offs in the fair determination of risk scores. *ITCS 2017*, LIPIcs 67, 43. <https://doi.org/10.4230/LIPIcs.ITCS.2017.43>
+- [R190] Chouldechova, A. (2017). Fair prediction with disparate impact: a study of bias in recidivism prediction instruments. *Big Data*, 5(2), 153–163. <https://doi.org/10.1089/big.2016.0047>
+- [R191] Appeals Centre Europe. Transparency report, April 2025 to March 2026. 2026-05. <https://www.appealscentre.eu/wp-content/uploads/2026/05/Transparency-Report-May-2026-English.pdf>
+- [R192] Jakesch, M., Hancock, J. T., Naaman, M. (2023). Human heuristics for AI-generated language are flawed. *PNAS*, 120(11), e2208839120. <https://doi.org/10.1073/pnas.2208839120>
+- [R193] Goldstein, J. A., Chao, J., Grossman, S., Stamos, A., Tomz, M. (2024). How persuasive is AI-generated propaganda? *PNAS Nexus*, 3(2), pgae034. <https://doi.org/10.1093/pnasnexus/pgae034>
+- [R194] OpenAI. Disrupting deceptive uses of AI by covert influence operations. 2024-05-30. <https://openai.com/index/disrupting-deceptive-uses-of-ai-by-covert-influence-operations/>
 - [R195] Meta. Adversarial threat report, first quarter 2024. 2024-05. Meta 威脅報告總頁：<https://transparency.meta.com/metasecurity/threat-reporting/> ；報告副本：<https://md.teyit.org/file/meta-threat-report.pdf>
-- [R196] NIST (2024). *NIST AI 100-4: Reducing Risks Posed by Synthetic Content*. https://doi.org/10.6028/NIST.AI.100-4
-- [R197] C2PA. Content Credentials explainer (v2.2). https://spec.c2pa.org/specifications/specifications/2.2/explainer/Explainer.html ；規格 v2.4：<https://spec.c2pa.org/specifications/specifications/2.4/specs/C2PA_Specification.html>
-- [R198] Adler, S., Hitzig, Z., Jain, S., et al. (2024). Personhood credentials: artificial intelligence and the value of privacy-preserving tools to distinguish who is real online. arXiv:2408.07892. https://arxiv.org/abs/2408.07892
-- [R199] Siddarth, D., Ivliev, S., Siri, S., Berman, P. (2020). Who watches the watchmen? A review of subjective approaches for Sybil-resistance in proof of personhood protocols. *Frontiers in Blockchain*, 3, 590171. https://doi.org/10.3389/fbloc.2020.590171
-- [R200] Agencia Española de Protección de Datos. La Agencia ordena una medida cautelar que impide a Worldcoin seguir tratando datos personales en España. 2024-03-06. https://www.aepd.es/prensa-y-comunicacion/notas-de-prensa/la-agencia-ordena-medida-cautelar-que-impide-a-worldcoin-seguir-tratando-datos-personales-en-espana
-- [R201] Office of the Privacy Commissioner for Personal Data, Hong Kong. Media statement on Worldcoin. 2024-05-22. https://www.pcpd.org.hk/english/news_events/media_statements/press_20240522.html
-- [R202] Tyler, T. R. (2006). *Why People Obey the Law* (new ed.; 1st ed. 1990, Yale UP). Princeton University Press. https://press.princeton.edu/books/paperback/9780691126739/why-people-obey-the-law
-- [R203] Tyler, T. R. (2003). Procedural justice, legitimacy, and the effective rule of law. *Crime and Justice*, 30, 283–357. https://doi.org/10.1086/652233
-- [R204] Pan, C. A., Yakhmi, S., Iyer, T. P., Strasnick, E., Zhang, A. X., Bernstein, M. S. (2022). Comparing the perceived legitimacy of content moderation processes: contractors, algorithms, expert panels, and digital juries. *PACM HCI*, 6(CSCW1), Article 82. https://doi.org/10.1145/3512929
-- [R205] Vaccaro, K., Sandvig, C., Karahalios, K. (2020). "At the end of the day Facebook does what it wants": how users experience contesting algorithmic content moderation. *PACM HCI*, 4(CSCW2), 1–22. https://doi.org/10.1145/3415238
-- [R206] Jhaver, S., Bruckman, A., Gilbert, E. (2019). Does transparency in moderation really matter? User behavior after content removal explanations on Reddit. *PACM HCI*, 3(CSCW), Article 150. https://doi.org/10.1145/3359252
-- [R207] Kim, P. H., Ferrin, D. L., Cooper, C. D., Dirks, K. T. (2004). Removing the shadow of suspicion: the effects of apology versus denial for repairing competence- versus integrity-based trust violations. *Journal of Applied Psychology*, 89(1), 104–118. https://doi.org/10.1037/0021-9010.89.1.104
-- [R208] Oversight Board. 2023 annual report. 2024-06. https://www.oversightboard.com/wp-content/uploads/2024/06/Oversight-Board-2023-Annual-Report.pdf
+- [R196] NIST (2024). *NIST AI 100-4: Reducing Risks Posed by Synthetic Content*. <https://doi.org/10.6028/NIST.AI.100-4>
+- [R197] C2PA. Content Credentials explainer (v2.2). <https://spec.c2pa.org/specifications/specifications/2.2/explainer/Explainer.html> ；規格 v2.4：<https://spec.c2pa.org/specifications/specifications/2.4/specs/C2PA_Specification.html>
+- [R198] Adler, S., Hitzig, Z., Jain, S., et al. (2024). Personhood credentials: artificial intelligence and the value of privacy-preserving tools to distinguish who is real online. arXiv:2408.07892. <https://arxiv.org/abs/2408.07892>
+- [R199] Siddarth, D., Ivliev, S., Siri, S., Berman, P. (2020). Who watches the watchmen? A review of subjective approaches for Sybil-resistance in proof of personhood protocols. *Frontiers in Blockchain*, 3, 590171. <https://doi.org/10.3389/fbloc.2020.590171>
+- [R200] Agencia Española de Protección de Datos. La Agencia ordena una medida cautelar que impide a Worldcoin seguir tratando datos personales en España. 2024-03-06. <https://www.aepd.es/prensa-y-comunicacion/notas-de-prensa/la-agencia-ordena-medida-cautelar-que-impide-a-worldcoin-seguir-tratando-datos-personales-en-espana>
+- [R201] Office of the Privacy Commissioner for Personal Data, Hong Kong. Media statement on Worldcoin. 2024-05-22. <https://www.pcpd.org.hk/english/news_events/media_statements/press_20240522.html>
+- [R202] Tyler, T. R. (2006). *Why People Obey the Law* (new ed.; 1st ed. 1990, Yale UP). Princeton University Press. <https://press.princeton.edu/books/paperback/9780691126739/why-people-obey-the-law>
+- [R203] Tyler, T. R. (2003). Procedural justice, legitimacy, and the effective rule of law. *Crime and Justice*, 30, 283–357. <https://doi.org/10.1086/652233>
+- [R204] Pan, C. A., Yakhmi, S., Iyer, T. P., Strasnick, E., Zhang, A. X., Bernstein, M. S. (2022). Comparing the perceived legitimacy of content moderation processes: contractors, algorithms, expert panels, and digital juries. *PACM HCI*, 6(CSCW1), Article 82. <https://doi.org/10.1145/3512929>
+- [R205] Vaccaro, K., Sandvig, C., Karahalios, K. (2020). "At the end of the day Facebook does what it wants": how users experience contesting algorithmic content moderation. *PACM HCI*, 4(CSCW2), 1–22. <https://doi.org/10.1145/3415238>
+- [R206] Jhaver, S., Bruckman, A., Gilbert, E. (2019). Does transparency in moderation really matter? User behavior after content removal explanations on Reddit. *PACM HCI*, 3(CSCW), Article 150. <https://doi.org/10.1145/3359252>
+- [R207] Kim, P. H., Ferrin, D. L., Cooper, C. D., Dirks, K. T. (2004). Removing the shadow of suspicion: the effects of apology versus denial for repairing competence- versus integrity-based trust violations. *Journal of Applied Psychology*, 89(1), 104–118. <https://doi.org/10.1037/0021-9010.89.1.104>
+- [R208] Oversight Board. 2023 annual report. 2024-06. <https://www.oversightboard.com/wp-content/uploads/2024/06/Oversight-Board-2023-Annual-Report.pdf>
 
 ---
 
 ## 相關筆記 (Related)
-- [[Prosocial SNS Mechanism Design - Discussion]]：社群平台的排序、社群筆記、身分驗證與網軍辨識。
+- [Prosocial SNS Mechanism Design - Discussion](Prosocial%20SNS%20Mechanism%20Design%20-%20Discussion.md)：社群平台的排序、社群筆記、身分驗證與網軍辨識。
 
